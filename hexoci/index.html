@@ -1,0 +1,200 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GitHub x Pages with CI 搭建静态化Hexo博客 | 小御坂的破站</title><meta name="keywords" content="CloudFlare,GitHub,Hexo,博客,Pages,静态页面"><meta name="author" content="Misaka No"><meta name="copyright" content="Misaka No"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="前言本篇博客为Lian Zhou代打，会讲一讲Misaka No的博客现在的架构以及如何做一个差不多的博客。 架构如果使用Hexo等静态页面生成器来构建个人博客的话肯定是建议使用Git + CI来进行储存+构建，因为如果静态博客一直在本地拖沓着没有版本控制&#x2F;备份再加上NodeJS等解释器语言模块化的特性，用不了多久一直在本地部署的博客就会变得臃肿不看，甚至歇菜。所以在这里推荐两种方式来部">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GitHub x Pages with CI 搭建静态化Hexo博客">
+<meta property="og:url" content="https://owo.misaka.rest/hexoci/index.html">
+<meta property="og:site_name" content="小御坂的破站">
+<meta property="og:description" content="前言本篇博客为Lian Zhou代打，会讲一讲Misaka No的博客现在的架构以及如何做一个差不多的博客。 架构如果使用Hexo等静态页面生成器来构建个人博客的话肯定是建议使用Git + CI来进行储存+构建，因为如果静态博客一直在本地拖沓着没有版本控制&#x2F;备份再加上NodeJS等解释器语言模块化的特性，用不了多久一直在本地部署的博客就会变得臃肿不看，甚至歇菜。所以在这里推荐两种方式来部">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://delicate-wave-402e.hudaye.workers.dev/getpic/8a60fb57-fb58-4c7d-9484-7e10b06e3341">
+<meta property="article:published_time" content="2022-02-07T21:30:00.000Z">
+<meta property="article:modified_time" content="2022-03-02T15:57:38.197Z">
+<meta property="article:author" content="Misaka No">
+<meta property="article:tag" content="CloudFlare">
+<meta property="article:tag" content="GitHub">
+<meta property="article:tag" content="Hexo">
+<meta property="article:tag" content="博客">
+<meta property="article:tag" content="Pages">
+<meta property="article:tag" content="静态页面">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://delicate-wave-402e.hudaye.workers.dev/getpic/8a60fb57-fb58-4c7d-9484-7e10b06e3341"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://owo.misaka.rest/hexoci/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: {"limitDay":60,"position":"top","messagePrev":"这篇文章已有","messageNext":"天没有更新了，可能内容已经过时或失效了"},
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    jQuery: 'https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js',
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/js/jquery.justifiedGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/justifiedGallery/dist/css/justifiedGallery.min.css'
+    },
+    fancybox: {
+      js: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'GitHub x Pages with CI 搭建静态化Hexo博客',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-03-02 23:57:38'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if (GLOBAL_CONFIG_SITE.isHome && /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.0.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://s2.loli.net/2022/01/14/aYp7giqB4c2zFEI.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data"><div class="data-item is-center"><div class="data-item-link"><a href="/archives/"><div class="headline">文章</div><div class="length-num">45</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/tags/"><div class="headline">标签</div><div class="length-num">115</div></a></div></div><div class="data-item is-center"><div class="data-item-link"><a href="/categories/"><div class="headline">分类</div><div class="length-num">14</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">小御坂的破站</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 时间轴</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">GitHub x Pages with CI 搭建静态化Hexo博客</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-02-07T21:30:00.000Z" title="发表于 2022-02-08 05:30:00">2022-02-08</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2022-03-02T15:57:38.197Z" title="更新于 2022-03-02 23:57:38">2022-03-02</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/VPS/">VPS</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="GitHub x Pages with CI 搭建静态化Hexo博客"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"></span></span></div></div></div><article class="post-content" id="article-container"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本篇博客为Lian Zhou代打，会讲一讲Misaka No的博客现在的架构以及如何做一个差不多的博客。</p>
+<h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><p>如果使用Hexo等静态页面生成器来构建个人博客的话肯定是建议使用Git + CI来进行储存+构建，因为如果静态博客一直在本地拖沓着没有版本控制&#x2F;备份再加上NodeJS等解释器语言模块化的特性，用不了多久一直在本地部署的博客就会变得臃肿不看，甚至歇菜。<br>所以在这里推荐两种方式来部署，都用到了GitHub作为储存库，区别在于是使用CloudFlare Pages还是使用Github Pages来部署&#x2F;分发页面。<br>而写这篇文章不仅是要讲讲这两种方法，也是对目前互联网上繁杂的信息做一个汇总，对现有的文章讲的东西进行优化之后再写的。</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>使用两种方法都需要的先决条件就是有一个GitHub储存库，里面放着我们Hexo的源文件。<br>按图中大致方式创建一个私有储存库储存库，如果使用公开储存库则会让别人轻松地访问到我们博客的源文件，日后遇到版权纠纷就难说了。<br><img src="https://i.w3tt.com/2022/02/08/TSIVB.png" alt="TSIVB.png"><br>创建好后，我们把这个库Clone到本地，这里建议使用GitHub Desktop进行操作。<br><img src="https://i.w3tt.com/2022/02/08/TSCos.png" alt="TSCos.png"><br>类似于这样，很方便地进行一个Clone。<br><img src="https://i.w3tt.com/2022/02/08/TSwrK.png" alt="TSwrK.png"><br>Clone之后我们打开本地的文件夹，在该文件打开终端，进行hexo的配置。<br>当然因为这个文件夹不是空的，所以我们无法直接在里面进行Init，我们先随便找一个空文件夹执行</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo -g</span><br><span class="line">hexo init</span><br></pre></td></tr></table></figure>
+<p>然后把这个文件夹内的东西移动到我们的Git文件夹<br><img src="https://i.w3tt.com/2022/02/08/T0MQa.png" alt="T0MQa.png"><br>最后像这样，然后再按照个人需求进行配置，这里不多赘述。<br>配置完成后我们将源文件Push到GitHub。<br><img src="https://i.w3tt.com/2022/02/08/T0O3S.png" alt="T0O3S.png"><br>回到GitHub Desktop我们可以发现更改已经可以提交了，在留言处随意写点什么然后commit即可，提交后我们发现旁边多出一个Push按钮，点击即可将更改推送到GitHub。<br>然后前置准备就完成了，让我们进入下一步。</p>
+<h2 id="CloudFlare-Pages"><a href="#CloudFlare-Pages" class="headerlink" title="CloudFlare Pages"></a>CloudFlare Pages</h2><p>这里先讲CFP的原因是这种方法相对于使用GitHub AC来部署会更简单易用，而且CF的CDN并不比GitHub慢，在SSL配置速度上甚至优于GitHub Pages。<br>下面是配置方法。<br>打开CloudFlare面板，进入Pages，添加一个站点。<br>按指引将自己的GitHub账户与CloudFlare连接起来后就可以选择储存库了，选择源文件所在的储存库，继续<br><img src="https://i.w3tt.com/2022/02/08/T0oiN.png" alt="T0oiN.png"><br>按图上配置填写自动构建信息，保存并部署，然后就可以看到CloudFlare自动帮我们部署站点，坐等三分钟即可。<br>部署完成后添加自定义域名也是十分的方便，无论域名是否接入CloudFlare都可以绑定到Pages上，如果域名是绑定在CloudFlare上的那CF还会帮我们搞定域名绑定。<br>自此，以后我们无论从何处向该储存库提交文章，CloudFlare Pages都会第一时间构建并发布我们的博客，十分方便。<br><img src="https://i.w3tt.com/2022/02/08/T0qtC.png" alt="T0qtC.png"><br>我们也可以在GitHub查看每一次提交对应的部署是否成功，在CloudFlare还可以对部署进行回滚等操作。</p>
+<h2 id="GitHub-Actions-X-Pages"><a href="#GitHub-Actions-X-Pages" class="headerlink" title="GitHub Actions X Pages"></a>GitHub Actions X Pages</h2><p>如果想全流程使用GitHub的话那我们也可以选择使用GitHub Actions作为CI自动构建，Pages作为PaaS来分发的方式来搭建Hexo博客。<br>首先我们需要为Actions准备一份SSH密钥作为其CI部署时向储存库提交更改的凭据。<br>来到一个Linux系统的终端，执行 <code>ssh-keygen -f hexocidemo</code>（-f 后的字段可自定义）<br>一路回车完毕后如图所示<br><img src="https://i.w3tt.com/2022/02/08/T052L.png" alt="T052L.png"><br>我们可以发现在这个目录多了两个文件，一个带有<code>.pub</code>后缀，一个没有，有后缀的为公钥，没有的为私钥，两个都留着备用。<br>打开GitHub，为Pages创建一个公开仓库（如果有GitHub Pro&#x2F;Team&#x2F;Enterprise那也可以是私有仓库），如下图所示<br><img src="https://i.w3tt.com/2022/02/08/T0Tbi.png" alt="T0Tbi.png"><br>其中 <code>github.io</code> 前应为你的GitHub用户名&#x2F;组织名以便获得无后缀的Pages入口。<br><img src="https://i.w3tt.com/2022/02/08/T0UgX.png" alt="T0UgX.png"><br>随便创建个文件，来到设置里发现已经自动开启了GitHub Pages<br><img src="https://i.w3tt.com/2022/02/08/T0WVt.png" alt="T0WVt.png"><br>接下来按图上流程添加一个公钥到仓库，内容是我们刚刚创建的公钥（请将文件内容一字不差地复制进去），然后保存。不要忘记勾选允许写入权限。<br><img src="https://i.w3tt.com/2022/02/08/T0kqx.png" alt="T0kqx.png"><br>然后想这样，把Git仓库的SSH信息复制走，备用。<br>之后回到我们刚刚存放源文件的私有库<br><img src="https://i.w3tt.com/2022/02/08/T0xrj.png" alt="T0xrj.png"><br>按流程添加对应公开仓库公钥的私钥，名称自定义。<br>来到<code>_config.yml</code>，修改<code>deploy</code>配置</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">deploy:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">git</span></span><br><span class="line">  <span class="attr">repo:</span> <span class="string">&lt;刚刚复制的SSH信息&gt;</span></span><br><span class="line">  <span class="attr">branch:</span> <span class="string">main</span></span><br></pre></td></tr></table></figure>
+<p>然后打开<code>package.json</code><br>在<code>&quot;dependencies&quot;</code>里加入<code>&quot;hexo-deployer-git&quot;: &quot;^3.0.0&quot;</code>，保存<br>新建目录&#x2F;文件 <code>.github/workflows/HexoCI.yml</code><br>在文件内写入如下</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">CI</span></span><br><span class="line"><span class="attr">on:</span></span><br><span class="line">  <span class="attr">push:</span></span><br><span class="line">    <span class="attr">branches:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">main</span></span><br><span class="line"><span class="attr">jobs:</span></span><br><span class="line">  <span class="attr">build:</span></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-latest</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Checkout</span> <span class="string">source</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">actions/checkout@v1</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">ref:</span> <span class="string">main</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Setup</span> <span class="string">NodeJS</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">actions/setup-node@v2</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">node-version:</span> <span class="string">$&#123;&#123;</span> <span class="string">matrix.node_version</span> <span class="string">&#125;&#125;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Setup</span> <span class="string">Hexo</span></span><br><span class="line">        <span class="attr">env:</span></span><br><span class="line">          <span class="attr">ACTION_DEPLOY_KEY:</span> <span class="string">$&#123;&#123;</span> <span class="string">secrets.&lt;刚刚的私钥的名字&gt;</span> <span class="string">&#125;&#125;</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">|</span></span><br><span class="line"><span class="string">          mkdir -p ~/.ssh/</span></span><br><span class="line"><span class="string">          echo &quot;$ACTION_DEPLOY_KEY&quot; &gt; ~/.ssh/id_rsa</span></span><br><span class="line"><span class="string">          chmod 600 ~/.ssh/id_rsa</span></span><br><span class="line"><span class="string">          ssh-keyscan github.com &gt;&gt; ~/.ssh/known_hosts</span></span><br><span class="line"><span class="string">          git config --global user.email &quot;&lt;Your Email&gt;&quot;</span></span><br><span class="line"><span class="string">          git config --global user.name &quot;&lt;Your NickName&gt;&quot;</span></span><br><span class="line"><span class="string">          npm install hexo-cli -g</span></span><br><span class="line"><span class="string">          npm install</span></span><br><span class="line"><span class="string">          sudo timedatectl set-timezone Asia/Shanghai</span></span><br><span class="line"><span class="string"></span>      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Deploy</span> <span class="string">Hexo</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">|</span></span><br><span class="line"><span class="string">          hexo clean</span></span><br><span class="line"><span class="string">          hexo d</span></span><br></pre></td></tr></table></figure>
+<p>不要忘记替换掉里面 <code>&lt;&gt;</code> 引出的内容<br>然后提交，不出意外就部署成功了<br><img src="https://i.w3tt.com/2022/02/08/T0zQp.png" alt="T0zQp.png"><br>进入Actions查看，14s就部署完成了，还是很快的。<br><img src="https://i.w3tt.com/2022/02/08/T0FCU.png" alt="T0FCU.png"><br>进入Public库查看，提交已经完成了。</p>
+<h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>为了方便大家参照，我把本次部署的所有仓库设置为了公开仓库以供查看。<br>源文件仓库:<a target="_blank" rel="noopener" href="https://github.com/KaguyaCloud/HexoSiteDemo-CI">https://github.com/KaguyaCloud/HexoSiteDemo-CI</a><br>GitHub Pages仓库:<a target="_blank" rel="noopener" href="https://github.com/KaguyaCloud/kaguyacloud.github.io">https://github.com/KaguyaCloud/kaguyacloud.github.io</a><br>CloudFlare Pages部署:<a target="_blank" rel="noopener" href="https://hexositedemo-ci.pages.dev/">https://hexositedemo-ci.pages.dev/</a><br>最后说两句，一个Git托管，CI构建的博客远没有想想中的复杂，现在PaaS也在激烈内卷，相信未来会有更多的Pages形式&#x2F;云函数形式的PaaS提供商出现，CI的门槛也会越来越低。并且从防攻击的角度来说，一个托管在PaaS上的静态博客也算是无懈可击了。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">Misaka No</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://owo.misaka.rest/hexoci/">https://owo.misaka.rest/hexoci/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://owo.misaka.rest" target="_blank">小御坂的破站</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/CloudFlare/">CloudFlare</a><a class="post-meta__tags" href="/tags/GitHub/">GitHub</a><a class="post-meta__tags" href="/tags/Hexo/">Hexo</a><a class="post-meta__tags" href="/tags/%E5%8D%9A%E5%AE%A2/">博客</a><a class="post-meta__tags" href="/tags/Pages/">Pages</a><a class="post-meta__tags" href="/tags/%E9%9D%99%E6%80%81%E9%A1%B5%E9%9D%A2/">静态页面</a></div><div class="post_share"><div class="social-share" data-image="https://delicate-wave-402e.hudaye.workers.dev/getpic/8a60fb57-fb58-4c7d-9484-7e10b06e3341" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js" defer></script></div></div><div class="post-reward"><div class="reward-button button--animated"><i class="fas fa-qrcode"></i> 打赏</div><div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220116063425.png" target="_blank"><img class="post-qr-code-img" src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220116063425.png" alt="爱发电"/></a><div class="post-qr-code-desc">爱发电</div></li></ul></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/pgm-userbot/"><img class="prev-cover" src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208162926.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">TG人形自走机器人项目PagerMaid安装教程</div></div></a></div><div class="next-post pull-right"><a href="/golang-linux-install/"><img class="next-cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Linux系统安装Go编程环境</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/argo-script/" title="CloudFlare Argo Tunnel 一键配置脚本及使用教程"><img class="cover" src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220211093405.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-19</div><div class="title">CloudFlare Argo Tunnel 一键配置脚本及使用教程</div></div></a></div><div><a href="/cf-argo-tunnel/" title="CloudFlare Argo Tunnel教程"><img class="cover" src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220211093405.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-11</div><div class="title">CloudFlare Argo Tunnel教程</div></div></a></div><div><a href="/cf-ip/" title="使用CloudFlareSpeedTest优选出适合自己的CF IP"><img class="cover" src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220115204525.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-01-15</div><div class="title">使用CloudFlareSpeedTest优选出适合自己的CF IP</div></div></a></div><div><a href="/github-ac-build-and-upload-file/" title="GitHub Actions 自动编译并发布文件"><img class="cover" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-14</div><div class="title">GitHub Actions 自动编译并发布文件</div></div></a></div><div><a href="/koyeb-cloud/" title="Koyeb容器云——是不是Heroku的继承者？"><img class="cover" src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220213161619.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-02-13</div><div class="title">Koyeb容器云——是不是Heroku的继承者？</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> 评论</span></div></div><div class="comment-wrap"><div><div id="disqus_thread"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://s2.loli.net/2022/01/14/aYp7giqB4c2zFEI.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Misaka No</div><div class="author-info__description">这只是一个小破站而已！！！</div></div><div class="card-info-data"><div class="card-info-data-item is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">45</div></a></div><div class="card-info-data-item is-center"><a href="/tags/"><div class="headline">标签</div><div class="length-num">115</div></a></div><div class="card-info-data-item is-center"><a href="/categories/"><div class="headline">分类</div><div class="length-num">14</div></a></div></div><a class="button--animated" id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Misaka-blog"><i class="fab fa-github"></i><span>博客的GitHub组织</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://t.me/misakanetcn" target="_blank" title="Telegram Group"><i class="fab fa-telegram"></i></a><a class="social-icon" href="https://github.com/misakano7545" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:misakablog@protonmail.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a><a class="social-icon" href="https://www.youtube.com/channel/UCN_wwfF8spBWjtRoZoTEwLA" target="_blank" title="YouTube"><i class="fab fa-youtube"></i></a></div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80"><span class="toc-number">1.</span> <span class="toc-text">前言</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9E%B6%E6%9E%84"><span class="toc-number">2.</span> <span class="toc-text">架构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%87%86%E5%A4%87"><span class="toc-number">3.</span> <span class="toc-text">准备</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CloudFlare-Pages"><span class="toc-number">4.</span> <span class="toc-text">CloudFlare Pages</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#GitHub-Actions-X-Pages"><span class="toc-number">5.</span> <span class="toc-text">GitHub Actions X Pages</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%80%E5%90%8E"><span class="toc-number">6.</span> <span class="toc-text">最后</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/coredump-shellscript-decrypt/" title="使用Core Dump对Shell Script解密"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="使用Core Dump对Shell Script解密"/></a><div class="content"><a class="title" href="/coredump-shellscript-decrypt/" title="使用Core Dump对Shell Script解密">使用Core Dump对Shell Script解密</a><time datetime="2022-03-02T15:57:38.197Z" title="发表于 2022-03-02 23:57:38">2022-03-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/koyeb-xray/" title="Koyeb部署Xray实现科学上网"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Koyeb部署Xray实现科学上网"/></a><div class="content"><a class="title" href="/koyeb-xray/" title="Koyeb部署Xray实现科学上网">Koyeb部署Xray实现科学上网</a><time datetime="2022-03-02T15:37:47.000Z" title="发表于 2022-03-02 23:37:47">2022-03-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/argo-script/" title="CloudFlare Argo Tunnel 一键配置脚本及使用教程"><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220211093405.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CloudFlare Argo Tunnel 一键配置脚本及使用教程"/></a><div class="content"><a class="title" href="/argo-script/" title="CloudFlare Argo Tunnel 一键配置脚本及使用教程">CloudFlare Argo Tunnel 一键配置脚本及使用教程</a><time datetime="2022-02-19T02:30:30.000Z" title="发表于 2022-02-19 10:30:30">2022-02-19</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/aeza-host/" title="Aeza俄罗斯VPS，注册并验证手机号可以获得500卢布试用金"><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220218111848.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Aeza俄罗斯VPS，注册并验证手机号可以获得500卢布试用金"/></a><div class="content"><a class="title" href="/aeza-host/" title="Aeza俄罗斯VPS，注册并验证手机号可以获得500卢布试用金">Aeza俄罗斯VPS，注册并验证手机号可以获得500卢布试用金</a><time datetime="2022-02-18T03:15:43.000Z" title="发表于 2022-02-18 11:15:43">2022-02-18</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/argo-xui/" title="在NAT机使用X-ui和Argo Tunnel配置节点"><img src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1/img/default.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="在NAT机使用X-ui和Argo Tunnel配置节点"/></a><div class="content"><a class="title" href="/argo-xui/" title="在NAT机使用X-ui和Argo Tunnel配置节点">在NAT机使用X-ui和Argo Tunnel配置节点</a><time datetime="2022-02-17T14:35:09.000Z" title="发表于 2022-02-17 22:35:09">2022-02-17</time></div></div></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2022 By Misaka No</div><div class="framework-info"><span>Powered by </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a><br/><a target="_blank" rel="noopener" href="https://icp.gov.moe/?keyword=20220615">萌ICP备20220615号</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">简</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><a id="to_comment" href="#post-comment" title="直达评论"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><div class="js-pjax"><script>function loadDisqus () {
+  var disqus_config = function () {
+    this.page.url = 'https://owo.misaka.rest/hexoci/'
+    this.page.identifier = 'hexoci/'
+    this.page.title = 'GitHub x Pages with CI 搭建静态化Hexo博客'
+  };
+
+  window.disqusReset = () => {
+    DISQUS.reset({
+      reload: true,
+      config: disqus_config
+    })
+  }
+
+  if (window.DISQUS) disqusReset()
+  else {
+    (function() { 
+      var d = document, s = d.createElement('script');
+      s.src = 'https://misakablog.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  }
+}
+
+if ('Disqus' === 'Disqus' || !true) {
+  if (true) btf.loadComment(document.getElementById('disqus_thread'), loadDisqus)
+  else loadDisqus()
+} else {
+  function loadOtherComment () {
+    loadDisqus()
+  }
+}
+</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

@@ -1,0 +1,1488 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search> 
+  
+  
+    
+    <entry>
+      <title>使用Core Dump对Shell Script解密</title>
+      <link href="/coredump-shellscript-decrypt/"/>
+      <url>/coredump-shellscript-decrypt/</url>
+      
+        <content type="html"><![CDATA[<p>在一些仓库内，我们想修改一些代码的时候，却发现作者很鸡贼的对脚本进行了加密。这篇文章主要来讲使用Core Dump对加密的Shell脚本进行解密。</p><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220225234203.png"></p><blockquote><p>感谢某作者在GitHub的付出，让我得以写一篇文章</p></blockquote><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一台VPS</li></ul><h2 id="解密步骤"><a href="#解密步骤" class="headerlink" title="解密步骤"></a>解密步骤</h2><ol><li>SSH登录至VPS</li><li>登录Root用户，执行以下命令</li></ol><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ulimit -c unlimited</span><br><span class="line">echo &quot;/core_dump/%e-%p-%t.core&quot; &gt; /proc/sys/kernel/core_pattern</span><br><span class="line">mkdir /core_dump</span><br></pre></td></tr></table></figure><p>第一句是设置内核coredump大小，这里设置不限制。第二句是设置coredump存储位置和格式，%e代表可执行程序名，%p代表pid， %t代表生成时间。然后去执行脚本如xxx.sh</p><ol start="3"><li><p>在执行需要解密的代码后面加入<code>6 start &amp; (sleep 0.01 &amp;&amp; kill -SIGSEGV $!)</code>，例如<code>./xxx.sh 6 start &amp; (sleep 0.01 &amp;&amp; kill -SIGSEGV $!)</code>，如无意外之后会输出类似[1]+ Segmentation fault (core dumped)…的提示</p></li><li><p>查看<code>/core_dump</code>文件夹下，就会有dump生成的文件了</p></li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220225235718.png"></p><ol start="5"><li>使用VS Code打开文件</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220225234716.png"></p><ol start="6"><li>拉下文件，可以看到代码已经解密出来了</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220225234816.png"></p><h2 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h2><p>FTown Blog：<a href="https://www.fythonfang.com/blog/2019/10/16/linux-core-dump-decrypt-script">https://www.fythonfang.com/blog/2019/10/16/linux-core-dump-decrypt-script</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 编程 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 脚本 </tag>
+            
+            <tag> 编程 </tag>
+            
+            <tag> Shell </tag>
+            
+            <tag> 加密 </tag>
+            
+            <tag> 解密 </tag>
+            
+            <tag> Linux </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Koyeb部署Xray实现科学上网</title>
+      <link href="/koyeb-xray/"/>
+      <url>/koyeb-xray/</url>
+      
+        <content type="html"><![CDATA[<p>在这篇教程中，我来和大家一起在Koyeb这个免费的容器上搭建V2ray节点，实现科学上网的需要。</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一枚GitHub账号</li><li>一枚Docker Hub账号</li><li>一枚Koyeb账号</li></ul><h2 id="部署步骤"><a href="#部署步骤" class="headerlink" title="部署步骤"></a>部署步骤</h2><ol><li>注册好GitHub账号</li><li>打开<a href="http://github.com/Misaka-blog/KOXray">仓库</a>，并Fork一份</li><li>进入“Settings”，输入名称，改名</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220129225241.png"></p><ol start="4"><li>编辑<code>Dockerfile</code>，说明如下</li></ol><p><code>AUUID</code>：用来部署节点的UUID，如有需要可在<a href="https://www.uuidgenerator.net/">uuidgenerator</a>生成</p><p><code>CADDYIndexPage</code>：伪装站首页文件</p><p><code>ParameterSSENCYPT</code>：ShadowSocks加密协议</p><ol start="5"><li>打开<a href="https://hub.docker.com/signup">Docker Hub官网</a>，注册账号</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220302234318.png"></p><ol start="6"><li>编辑Actions文件<code>docker-image.yml</code>，按照“name: Docker Hub ID&#x2F;自定义镜像名称”格式修改第13行</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220302234657.png"></p><ol start="7"><li>添加Actions的Secrets变量，变量说明如下</li></ol><p><code>DOCKER_USERNAME</code>：Docker Hub ID</p><p><code>DOCKER_PASSWORD</code>：Docker Hub 登录密码</p><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220302234739.png"></p><ol start="8"><li>运行Actions以编译镜像，大概需要1分钟时间</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220302235025.png"></p><ol start="9"><li>打开Koyeb云，登录自己的账号</li><li>创建一个APP，配置如下</li></ol><p><code>Docker Image</code>：Docker Hub镜像地址，格式为“docker.io&#x2F;Docker Hub ID&#x2F;自定义镜像名称”</p><p><code>Container size</code>：部署配置，一般默认即可</p><p><code>Port</code>：80</p><p>Environment variables：<code>Key</code>：PORT，<code>Value</code>：80 </p><p><code>Name</code>：自己定义</p><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220302235349.png"></p><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220302235420.png"></p><ol start="11"><li>大概等待1-3分钟，然后出现“Healthy”字样即为部署成功</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220302235544.png"></p><ol start="12"><li>客户端配置如下（以VMess为例）</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220302235655.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 科学上网 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 节点 </tag>
+            
+            <tag> 科学上网 </tag>
+            
+            <tag> V2ray </tag>
+            
+            <tag> Koyeb </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>CloudFlare Argo Tunnel 一键配置脚本及使用教程</title>
+      <link href="/argo-script/"/>
+      <url>/argo-script/</url>
+      
+        <content type="html"><![CDATA[<p>在之前的CloudFlare Argo Tunnel教程中，关于Argo Tunnel客户端有很多又臭又长的命令。对于很多小白来说不仅是烦，而且还有可能配置不成功。经过了我的完善，CloudFlare Argo Tunnel一键配置脚本终于完工了。下面这篇文章就是我的脚本的使用教程</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一台VPS</li><li>一枚域名并NS解析到CloudFlare</li><li>一枚CloudFlare账号</li></ul><h2 id="使用步骤"><a href="#使用步骤" class="headerlink" title="使用步骤"></a>使用步骤</h2><ol><li>SSH登录至VPS，运行以下命令</li></ol><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget -N https://cdn.jsdelivr.net/gh/Misaka-blog/argo-tunnel-script@master/argo.sh &amp;&amp; bash argo.sh</span><br></pre></td></tr></table></figure><ol start="2"><li>在主页可以显示当前cloudflared客户端安装状态和CF账号登录状态</li><li>输入1安装cloudflared客户端</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220219103747.png"></p><ol start="4"><li>输入2授权CF账号内的域名登录cloudflared客户端</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220219103852.png"></p><ol start="5"><li>待登录完成后，主页应该会显示这样</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220219104014.png"></p><ol start="6"><li>输入3配置Argo Tunnel隧道，按照提示步骤生成配置文件</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220219104246.png"></p><ol start="7"><li>输入5运行隧道，脚本会自动创建screen会话供隧道后台运行使用</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220219104347.png"></p><ol start="8"><li>输入6停止screen后台</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220219104429.png"></p><ol start="9"><li>部分脚本内的操作灰常简单，这里就不再说明了</li></ol><h2 id="仓库地址"><a href="#仓库地址" class="headerlink" title="仓库地址"></a>仓库地址</h2><p><a href="https://github.com/Misaka-blog/argo-tunnel-script">https://github.com/Misaka-blog/argo-tunnel-script</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 脚本 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> 服务器 </tag>
+            
+            <tag> argo </tag>
+            
+            <tag> tunnel </tag>
+            
+            <tag> CloudFlare </tag>
+            
+            <tag> 脚本 </tag>
+            
+            <tag> 内网穿透 </tag>
+            
+            <tag> 隧道 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Aeza俄罗斯VPS，注册并验证手机号可以获得500卢布试用金</title>
+      <link href="/aeza-host/"/>
+      <url>/aeza-host/</url>
+      
+        <content type="html"><![CDATA[<p>Aeza是2021年10月创建的新的主机提供商。他们的主机有DDoS防御，高效的性能。今天这篇文章就来和大家介绍下Aeza这家主机提供商</p><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220218111848.png"></p><h2 id="注册条件"><a href="#注册条件" class="headerlink" title="注册条件"></a>注册条件</h2><ul><li>一枚邮箱</li><li>一枚手机号（目前支持GV）</li></ul><h2 id="注册步骤"><a href="#注册步骤" class="headerlink" title="注册步骤"></a>注册步骤</h2><ol><li>打开<a href="https://aeza.net/?ref=344862">官网</a>进行注册</li><li>在Settings更改语言，验证手机号码。验证手机号码的方式为电话验证，请注意接听。</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220218112137.png"></p><blockquote><p>PS: 如未收到验证电话可以去找官方TG客服：@aezasupport</p></blockquote><ol start="3"><li>你就可以获得500卢布的试用金了</li></ol><h2 id="价格表"><a href="#价格表" class="headerlink" title="价格表"></a>价格表</h2><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220218113246.png"></p><h2 id="跑分"><a href="#跑分" class="headerlink" title="跑分"></a>跑分</h2><p>跑分机器为本服务商的EPs-1机器，还是很不错的</p><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220218113328.png"></p><h2 id="路由"><a href="#路由" class="headerlink" title="路由"></a>路由</h2><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220218115522.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> aeza </tag>
+            
+            <tag> 俄罗斯 </tag>
+            
+            <tag> 服务器 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>在NAT机使用X-ui和Argo Tunnel配置节点</title>
+      <link href="/argo-xui/"/>
+      <url>/argo-xui/</url>
+      
+        <content type="html"><![CDATA[<p>在我们使用NAT VPS的时候，我们有时候会遇到IP被墙的时候。由于NAT鸡比较特殊，只有一部分端口给外网开放。这导致我们无法使用正常的CloudFlare反代节点。这一期教程就来和大家在NAT机使用X-ui和Argo Tunnel配置节点。</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一台NAT VPS</li><li>一枚CloudFlare账号</li><li>一枚域名</li></ul><h2 id="部署步骤"><a href="#部署步骤" class="headerlink" title="部署步骤"></a>部署步骤</h2><ol><li>进入你的主机提供商的面板，申请端口。这里我使用的是Hax刚刚出的NAT VPS，点击蓝色的“IP &amp; Port for NATVPS”按钮</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208191524.png"></p><ol start="2"><li>输入“PORT”，同意协议及通过人机验证，点击绿色的“Request Port”按钮</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208191647.png"></p><ol start="3"><li>这里会出现SSH的端口，可以使用的端口范围</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208191731.png"></p><blockquote><p>PS: 不同提供商的面板会有所差别，但大体都是一样的</p></blockquote><ol start="4"><li>使用NAT提供的SSH端口，登录VPS</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208191834.png"></p><ol start="5"><li>这里我们准备使用X-ui安装节点。执行以下代码安装X-ui</li></ol><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bash &lt;(curl -Ls https://raw.githubusercontents.com/vaxilu/x-ui/master/install.sh)</span><br></pre></td></tr></table></figure><ol start="6"><li>安装完成之后，输入<code>x-ui</code>命令进入管理菜单，更改端口</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208192511.png"></p><ol start="7"><li>成功进入面板</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208192606.png"></p><ol start="8"><li>打开<a href="https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/installation">CloudFlare Argo Tunnel官网</a></li><li>选择自己的Linux版本下载对应的安装包。CentOS系系统选择rpm包下载，Debian系系统选择deb包下载</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220211093741.png"></p><ol start="10"><li><p>使用<code>dpkg -i cloudflared-linux-amd64.deb</code>（CentOS：rpm -i cloudflared-linux-amd64.rpm）安装cloudflared客户端</p></li><li><p>使用<code>cloudflared tunnel login</code>登录你的CloudFlare账号</p></li><li><p>复制控制台出现的网址登录你的CloudFlare账号</p></li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220211094401.png"></p><ol start="13"><li>选择一个域名，授权给Argo Tunnel</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220211094543.png"></p><ol start="14"><li>使用<code>cloudflared tunnel create 隧道名</code>创建隧道</li><li>使用<code>cloudflared tunnel route dns 隧道名 刚才选择的域名（或二级域名）</code>配置域名DNS记录</li><li>使用<code>cloudflared tunnel list</code>列出创建隧道的详细信息</li><li>创建一个yml文件，内容如下</li></ol><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tunnel:</span> <span class="string">隧道名称</span></span><br><span class="line"><span class="attr">credentials-file:</span> <span class="string">/root/.cloudflared/UUID.json</span></span><br><span class="line"><span class="attr">originRequest:</span></span><br><span class="line">  <span class="attr">connectTimeout:</span> <span class="string">30s</span></span><br><span class="line">  <span class="attr">noTLSVerify:</span> <span class="literal">true</span></span><br><span class="line"><span class="attr">ingress:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">hostname:</span> <span class="string">域名</span></span><br><span class="line">    <span class="attr">service:</span> <span class="string">https://localhost:443</span> <span class="comment"># 本文以反代本地443端口为例</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">service:</span> <span class="string">http_status:404</span></span><br></pre></td></tr></table></figure><ol start="18"><li>打开<code>/root/.cloudflared/cert.pem</code>文件</li><li>复制里面的两段内容（图内有注释），作为x-ui证书的公钥和私钥</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220217225808.png"></p><ol start="20"><li>X-ui按下图所示配置</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220217230400.png"></p><ol start="21"><li>使用<code>cloudflared tunnel --config 自己的yml文件 run</code>运行隧道</li><li>测试延迟</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220217231055.png"></p><ol start="23"><li>测试完成后，把在21步的命令在screen后台运行即可</li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> 服务器 </tag>
+            
+            <tag> Argo </tag>
+            
+            <tag> Tunnel </tag>
+            
+            <tag> NAT </tag>
+            
+            <tag> xui </tag>
+            
+            <tag> 节点 </tag>
+            
+            <tag> 科学上网 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>freenom申请免费域名</title>
+      <link href="/freenom/"/>
+      <url>/freenom/</url>
+      
+        <content type="html"><![CDATA[<p>在我们建设网站的时候，总得使用一个域名吧。但是我们手头目前没钱的话，一个域名好几美元一年的价格可能会承担不起。这时候我们可以申请Freenom的免费域名来救急。但是Freenom的谜之操作，实在让人捉不住头脑。今天我就来带大家注册Freenom的域名。</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一枚邮箱</li></ul><h2 id="注册技巧"><a href="#注册技巧" class="headerlink" title="注册技巧"></a>注册技巧</h2><ol><li>点击<a href="https://ipinfo.io/">这里</a>，查看你自己的IP所在国家</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220217094839.png"></p><ol start="2"><li>打开<a href="https://www.freenom.com/en/index.html">Freenom官网</a></li><li>依次点击“Partners”→“Developers”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220217095008.png"></p><ol start="4"><li>把网页往下拉，点击绿色的“Get a Random Domains Account today!”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220217095137.png"></p><ol start="5"><li>输入邮箱地址，然后点击“Verify my Email address”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220217095241.png"></p><ol start="6"><li>检查收件箱内的Freenom激活邮件</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220217095712.png"><br><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220217095800.png"></p><ol start="7"><li>在弹出的网页中，输入你自己想要注册的域名</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220217095838.png"></p><ol start="8"><li>点击绿色的“Checkout”按钮</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220217095934.png"></p><ol start="9"><li>选择使用期限，点击“Continue”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220217100117.png"></p><ol start="10"><li>把上面的域名服务取消掉</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220217100156.png"></p><ol start="11"><li>填入IP所在国家的个人信息，同意协议，点击“Complete Order”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220217100314.png"></p><ol start="12"><li>注册成功</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220217100506.png"></p><blockquote><p>PS: 如果注册提示错误，请依次点击“Hello, xxx”→“Edit account details”进行个人信息修改，注意填写国家一定是要和IP地址一致</p></blockquote><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220217164429.png"><br><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220217164530.png"></p><ol start="13"><li>依次点击“Services”→“My Domains”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220217100539.png"></p><ol start="14"><li>在这里可以看到你注册的域名，点击“Manage Domain”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220217100637.png"></p><ol start="15"><li>按照图示步骤修改DNS服务器</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220217100727.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 域名 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 白嫖 </tag>
+            
+            <tag> 域名 </tag>
+            
+            <tag> freenom </tag>
+            
+            <tag> 免费 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Python3解析IP CIDR块</title>
+      <link href="/python3-cidr/"/>
+      <url>/python3-cidr/</url>
+      
+        <content type="html"><![CDATA[<p>这篇文章主要来记录如何使用Python3解析IP CIDR块</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> ipaddress <span class="comment"># 导入ipaddress模块</span></span><br><span class="line">net = ipaddress.ip_network(<span class="string">&#x27;123.45.67.64/27&#x27;</span>) <span class="comment"># 这里传入IPv4 CIDR，也可以传入IPv6 CIDR</span></span><br><span class="line"><span class="keyword">for</span> a <span class="keyword">in</span> net:</span><br><span class="line">    <span class="comment"># 使用for循环解析CIDR块下的IP</span></span><br><span class="line">    <span class="built_in">print</span>(a)</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> 编程 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 编程 </tag>
+            
+            <tag> IPv4 </tag>
+            
+            <tag> IP </tag>
+            
+            <tag> 记录 </tag>
+            
+            <tag> Python </tag>
+            
+            <tag> CIDR </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>宝塔国际版aaPanel安装教程</title>
+      <link href="/aapanel-install/"/>
+      <url>/aapanel-install/</url>
+      
+        <content type="html"><![CDATA[<p>在我们使用宝塔面板的过程中，一定会遇到很恶心的绑定账号的问题。今天我就来介绍宝塔面板的国际版——aaPanel</p><ol><li>SSH登录至VPS</li><li>执行以下命令安装aaPanel</li></ol><p>CentOS:</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install -y wget &amp;&amp; wget -O install.sh http://www.aapanel.com/script/install_6.0_en.sh &amp;&amp; bash install.sh forum</span><br></pre></td></tr></table></figure><p>Debian &#x2F; Ubuntu:</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget -O install.sh http://www.aapanel.com/script/install-ubuntu_6.0_en.sh &amp;&amp; sudo bash install.sh forum</span><br></pre></td></tr></table></figure><ol start="3"><li>待安装完成后，使用下方的外网面板访问地址和提供的用户名密码登录面板</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220215114145.png"></p><ol start="4"><li>选择组件安装</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220215114509.png"></p><ol start="5"><li>到这里就和宝塔面板没什么太大的差别了</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220215114558.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> 宝塔面板 </tag>
+            
+            <tag> aaPanel </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>GitHub Actions 自动编译并发布文件</title>
+      <link href="/github-ac-build-and-upload-file/"/>
+      <url>/github-ac-build-and-upload-file/</url>
+      
+        <content type="html"><![CDATA[<p>最近我在改版自用的CF IP优选工具的时候，总得为所有的系统编译一遍版本。而Go编程语言的交叉编译特性，可以在自己的系统中编译出不同系统的版本。但是这个交叉编译的命令又臭又长。于是我就折磨起了GitHub Actions，开启了自动编译并发布文件之路</p><p>下面是Ubuntu编译环境下使用Go语言编译的示例</p><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">Build</span> <span class="string">Test</span></span><br><span class="line"><span class="attr">on:</span></span><br><span class="line">  <span class="attr">push:</span></span><br><span class="line">    <span class="attr">branches:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">master</span></span><br><span class="line"><span class="attr">jobs:</span></span><br><span class="line">  <span class="attr">Build:</span></span><br><span class="line">    <span class="attr">name:</span> <span class="string">Build</span> <span class="string">Linux</span> <span class="string">Version</span></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-latest</span></span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">uses:</span> <span class="string">actions/checkout@v2</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Setting</span> <span class="string">up</span> <span class="string">Go</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">actions/setup-go@v2</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">go-version:</span> <span class="number">1.17</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Building</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">|</span></span><br><span class="line"><span class="string">          go build main.go</span></span><br><span class="line"><span class="string">          # 在此生成一个release文件夹，用来做接下来的打包成品使用</span></span><br><span class="line"><span class="string">          mkdir release</span></span><br><span class="line"><span class="string">          cp main release/main</span></span><br><span class="line"><span class="string"></span>      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Uploading</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">actions/upload-artifact@v1</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">name:</span> <span class="string">release_linux</span> <span class="comment"># 生成的压缩包名称</span></span><br><span class="line">          <span class="attr">path:</span> <span class="string">release</span> <span class="comment"># 需要打包的路径</span></span><br></pre></td></tr></table></figure><p>如无意外，文件会在Actions编译完毕后生成在任务下方，可供下载</p><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220214110351.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Actions </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 编程 </tag>
+            
+            <tag> GitHub </tag>
+            
+            <tag> Actions </tag>
+            
+            <tag> 自动化 </tag>
+            
+            <tag> 编译 </tag>
+            
+            <tag> 发布 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Koyeb容器云——是不是Heroku的继承者？</title>
+      <link href="/koyeb-cloud/"/>
+      <url>/koyeb-cloud/</url>
+      
+        <content type="html"><![CDATA[<p>Koyeb是一个方便开发者的无服务器平台，可以在全球范围内部署应用程序。无操作、服务器和基础设施管理。这个看起来和Heroku类似的平台，到底该怎样使用呢？下面这篇文章就来和大家一起玩转Koyeb容器云平台。</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一枚邮箱</li><li>GitHub账号（可选）</li></ul><h2 id="部署步骤"><a href="#部署步骤" class="headerlink" title="部署步骤"></a>部署步骤</h2><h3 id="注册与登录"><a href="#注册与登录" class="headerlink" title="注册与登录"></a>注册与登录</h3><ol><li>打开<a href="https://www.koyeb.com/">官网</a></li><li>点击右上角的“Sign UP”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220213161619.png"></p><ol start="3"><li>可以使用GitHub登录，也可以使用自己的邮箱注册并登录</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220213161657.png"></p><ol start="4"><li>登录到Koyeb的控制面板</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220213161738.png"></p><blockquote><p>PS: 在Koyeb预览测试期间，每个账号最多可以运行两个容器服务，任何容器大小不超过2GB的内存。一旦正式版上线，你将免费获得5美元&#x2F;月的使用额度</p></blockquote><h3 id="部署应用"><a href="#部署应用" class="headerlink" title="部署应用"></a>部署应用</h3><ol><li>在控制面板主页中，点击“Create APP”</li><li>这里可以使用GitHub仓库或Docker镜像进行部署，我以GitHub反代服务为例进行部署，按照下图设置。设置完成后，点击“Create APP”进行创建</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220213162203.png"><br><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220213162424.png"> </p><ol start="3"><li>等待部署，大概需要1-10分钟</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220213162511.png"></p><ol start="4"><li>部署完成</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220213162618.png"></p><ol start="5"><li>可以在应用面板调整容器的相关设置</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220213162714.png"></p><h3 id="配置跑分"><a href="#配置跑分" class="headerlink" title="配置跑分"></a>配置跑分</h3><p>为了避免滥用，故不教大家如何使用SSH访问Koyeb容器云，下面是Koyeb云的配置和跑分</p><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220213162812.png"></p><h2 id="部署GitHub反代示例"><a href="#部署GitHub反代示例" class="headerlink" title="部署GitHub反代示例"></a>部署GitHub反代示例</h2><p><a href="https://gh-proxy-misakano7545.koyeb.app/">https://gh-proxy-misakano7545.koyeb.app/</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 容器 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> GitHub </tag>
+            
+            <tag> Koyeb </tag>
+            
+            <tag> Docker </tag>
+            
+            <tag> 容器 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>CloudFlare Argo Tunnel教程</title>
+      <link href="/cf-argo-tunnel/"/>
+      <url>/cf-argo-tunnel/</url>
+      
+        <content type="html"><![CDATA[<p>在我们使用NAT VPS的时候，或者是我们自己使用本地环境的时候，由于我们没有公网IP，只能使用内网穿透的法子。这时候，我们就可以使用CloudFlare Argo Tunnel来穿透我们需要使用公网IP的服务，并且可以自定义域名。</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一枚域名，并DNS解析到CloudFlare</li></ul><h2 id="步骤方法"><a href="#步骤方法" class="headerlink" title="步骤方法"></a>步骤方法</h2><ol><li>打开<a href="https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/installation">官网</a></li><li>选择自己的Linux版本下载对应的安装包。CentOS系系统选择rpm包下载，Debian系系统选择deb包下载</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220211093741.png"></p><ol start="3"><li>使用<code>dpkg -i cloudflared-linux-amd64.deb</code>（CentOS：rpm -i cloudflared-linux-amd64.rpm）安装cloudflared客户端</li></ol><blockquote><p>PS: 本文中官网下载的文件名为<code>cloudflared-linux-amd64.deb</code>，请按照实际文件名安装</p></blockquote><ol start="4"><li>可以使用<code>cloudflared tunnel --url http://127.0.0.1:http端口号</code>测试HTTP隧道效果或使用<code>cloudflared tunnel --url tcp://127.0.0.1:tcp端口号</code>测试HTTP隧道效果</li><li>使用<code>cloudflared tunnel login</code>登录你的CloudFlare账号</li><li>复制控制台出现的网址登录你的CloudFlare账号</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220211094401.png"></p><ol start="7"><li>选择一个域名，授权给Argo Tunnel</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220211094543.png"></p><ol start="8"><li>下面是一些常用的命令</li></ol><p>创建隧道：<code>cloudflared tunnel create 隧道名</code><br>删除隧道：<code>cloudflared tunnel delete 隧道名</code><br>列出隧道：<code>cloudflared tunnel list</code><br>配置隧道：<code>cloudflared tunnel route dns 隧道名 [CNAME 记录名称].[接入 CLoudflare 的域名]</code><br>运行隧道：<code>cloudflared tunnel run --url http://127.0.0.1:http端口号 隧道名字</code></p><ol start="9"><li>使用YML配置文件文件如下</li></ol><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tunnel:</span> [<span class="string">tunnel</span> <span class="string">的名称或</span> <span class="string">UUID</span>]</span><br><span class="line"><span class="attr">credentials-file:</span> <span class="string">/root/.cloudflared/[tunnel</span> <span class="string">的</span> <span class="string">UUID].json</span></span><br><span class="line"></span><br><span class="line"><span class="attr">ingress:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">hostname:</span> [<span class="string">CNAME</span> <span class="string">记录名称</span>]<span class="string">.[接入</span> <span class="string">CLoudflare</span> <span class="string">的域名]</span></span><br><span class="line">    <span class="attr">service:</span> <span class="string">http://localhost:80</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">service:</span> <span class="string">http_status:404</span></span><br></pre></td></tr></table></figure><p>配置文件使用 Ingress 规则，如果想配置 SSH、TCP 等其他协议，可以查看<a href="https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/configuration/ingress">其官网</a></p><p>然后使用<code>cloudflared tunnel --config [配置文件路径] run</code>运行隧道</p><p>参考：<a href="https://www.blueskyxn.com/202102/4176.html">https://www.blueskyxn.com/202102/4176.html</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 教程 </tag>
+            
+            <tag> CloudFlare </tag>
+            
+            <tag> 内网穿透 </tag>
+            
+            <tag> 隧道 </tag>
+            
+            <tag> ArgoTunnel </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Linux VPS清理系统垃圾</title>
+      <link href="/vps-cleanup/"/>
+      <url>/vps-cleanup/</url>
+      
+        <content type="html"><![CDATA[<p>在我们日常使用系统中，总会出现系统空间爆满的情况吧。VPS也不例外，在我们使用的时候，总会产生各种各样的日志文件。这时候我们如何去清理VPS上的系统垃圾呢？让我们一起来看看吧。</p><ol><li>删除系统帮助文档和日志文件。在我们使用VPS中，我们一般不会注意上Linux系统的帮助文档。这时候，我们可以使用下面两个命令去删除</li></ol><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">rm -rf /usr/share/man/*</span><br><span class="line">rm -rf /var/log/* </span><br><span class="line">rm -f /var/log/*/*</span><br></pre></td></tr></table></figure><ol start="2"><li>使用<code>apt autoremove</code>清理掉一些不要的依赖包</li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> Linux </tag>
+            
+            <tag> 系统 </tag>
+            
+            <tag> 垃圾 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>使用WARP解锁流媒体</title>
+      <link href="/warp-unblock/"/>
+      <url>/warp-unblock/</url>
+      
+        <content type="html"><![CDATA[<p>在我们使用VPS的时候，有很大一部分VPS是不能解锁流媒体网站的。这些流媒体网站为了版权考虑，会对数据中心的IP屏蔽。这篇文章主要来讲使用WARP来解锁流媒体网站。</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一台VPS</li></ul><h2 id="部署步骤"><a href="#部署步骤" class="headerlink" title="部署步骤"></a>部署步骤</h2><ol><li>安装WARP或WARP Linux Client</li><li>运行以下脚本</li></ol><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bash &lt;(curl -sSL https://raw.githubusercontent.com/fscarmen/warp_unlock/main/unlock.sh)</span><br></pre></td></tr></table></figure><ol start="3"><li>选择模式，一般就选择模式1</li><li>选择需要解锁的流媒体</li><li>选择解锁地区，我这里以德国区为演示</li><li>打开<a href="https://t.me/BotFather">@BotFather</a>，按照图示创建一个新的Bot，获取API Token</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220129110433.png"></p><ol start="7"><li>输入Bot Token</li><li>打开<a href="https://t.me/userinfobot">@userinfobot</a>，获取自己的用户ID</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220129110726.png"></p><ol start="9"><li>输入你的用户ID</li><li>输入名称</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220210174008.png"></p><ol start="11"><li>安装成功，接下来就等在TG机器人推送成功的信息了</li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+          <category> 脚本 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> IPv4 </tag>
+            
+            <tag> IPv6 </tag>
+            
+            <tag> WARP </tag>
+            
+            <tag> Netfilx </tag>
+            
+            <tag> Disney+ </tag>
+            
+            <tag> 流媒体 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>OpenVZ VPS卸载其自带的apache组件</title>
+      <link href="/openvz-apache/"/>
+      <url>/openvz-apache/</url>
+      
+        <content type="html"><![CDATA[<p>在OpenVZ的VPS当中，我们会遇到80&#x2F;443端口被占用的情况。这是因为OpenVZ的VPS当中，自带的Apache2组件导致的。这篇教程我就来教大家如何移除OpenVZ VPS自带的Apache2组件</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一台OpenVZ VPS</li></ul><h2 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h2><ol><li>SSH进入VPS</li><li>执行以下命令</li></ol><p>CentOS:</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">systemctl stop httpd.service</span><br><span class="line">yum erase httpd.x86_64 -y</span><br><span class="line">find /etc -name &quot;*apache*&quot; |xargs  rm -rf </span><br><span class="line">rm -rf /var/www</span><br><span class="line">rm -rf /etc/libapache2-mod-jk</span><br></pre></td></tr></table></figure><p>Debian &#x2F; Ubuntu:</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">apt-get --purge remove apache2.2 apache2-doc apache2-utils -y</span><br><span class="line">find /etc -name &quot;*apache*&quot; |xargs  rm -rf </span><br><span class="line">rm -rf /var/www</span><br><span class="line">rm -rf /etc/libapache2-mod-jk</span><br></pre></td></tr></table></figure><ol start="3"><li>移除完成</li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> 服务器 </tag>
+            
+            <tag> openvz </tag>
+            
+            <tag> apache </tag>
+            
+            <tag> 组件 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>使用WO Mic连接手机当作电脑的麦克风</title>
+      <link href="/wo-mic/"/>
+      <url>/wo-mic/</url>
+      
+        <content type="html"><![CDATA[<p>在我们的日常生活中，有些时候我们要在电脑上面使用麦克风。但是，如果电脑的麦克风坏了或者是没有呢？我们如果需要急用，又不能为了一个麦克风去网上花钱买一个。这时候，如果我们有手机的话，可以考虑使用WO Mic这个软件，直接使用手机的麦克风当作电脑的麦克风。</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一台Windows的电脑</li><li>一台手机</li></ul><h2 id="步骤方法"><a href="#步骤方法" class="headerlink" title="步骤方法"></a>步骤方法</h2><ol><li>打开<a href="https://wolicheng.com/womic/">官网</a></li><li>下载WO Mic的Windows客户端</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220210160937.png"></p><ol start="3"><li>下载完成后，安装驱动和客户端</li><li>打开手机应用商店，找到“WO Mic”客户端，下载并安装</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220210161254.png"></p><ol start="5"><li>打开手机客户端，点击“Start”按钮</li><li>这时候手机客户端会提示当前连接WIFI的内网IP地址</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220210161308.png"></p><ol start="7"><li>将电脑连接到和手机同一个网络</li><li>打开电脑客户端，点击“连接”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220210161401.png"></p><ol start="9"><li>选择“WIFI”，输入刚刚在手机客户端提示的内网IP地址</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220210161439.png"></p><ol start="10"><li>待左下角出现“已连接”，即为连接成功</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220210161508.png"></p><ol start="11"><li>在需要使用麦克风的APP里（本文以Telegram为例），选择“WO Mic Device”即可</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220210161608.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 实用技巧 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> womic </tag>
+            
+            <tag> 手机 </tag>
+            
+            <tag> 电脑 </tag>
+            
+            <tag> 麦克风 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>在VPS内安装WARP Linux Client</title>
+      <link href="/warp-linuxclient/"/>
+      <url>/warp-linuxclient/</url>
+      
+        <content type="html"><![CDATA[<p>在部分需求中，我们只需要使用warp到某个站点。但是在前面的WARP教程中，我是安装了以WireGuard协议的WARP。这个WARP有个缺点就是无法在我们使用特定的站点使用warp ip。于是，我们有一个替代方案——安装WARP Linux Client。WARP Linux Client再配合我之前发布的X-ui分流教程就可以实现使用warp ip访问特定的站点</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一台IPv4的VPS</li><li>开启TUN模块（仅限LXC &#x2F; OpenVZ架构的VPS）</li></ul><h2 id="安装过程"><a href="#安装过程" class="headerlink" title="安装过程"></a>安装过程</h2><p>这里还是使用到了fscarmen的脚本</p><ol><li>打开TUN模块（如果是KVM机器可跳过此步骤）。以Hax官网为例，打开官网的控制面板，点击“Enable TUN”按钮，稍等片刻后再点击“Restart”按钮重启VPS</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115155318.png"></p><ol start="2"><li>输入<code>cat /dev/net/tun</code>命令，检查TUN模块状态，如出现“cat: &#x2F;dev&#x2F;net&#x2F;tun: File descriptor in bad state”时即为开启成功</li><li>复制以下安装命令</li></ol><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget -N https://cdn.jsdelivr.net/gh/fscarmen/warp/menu.sh &amp;&amp; bash menu.sh</span><br></pre></td></tr></table></figure><ol start="4"><li>选择语言，输入2选择简体中文</li><li>输入“5”安装 WARP 的 Linux Client 和代理模式</li><li>输入warp+密钥，如没有可以回车跳过</li><li>设置端口号，一般默认回车使用40000端口</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220209034755.png"></p><ol start="8"><li>等待安装完成</li><li>安装完成后，出现Client的本地代理地址和WARP IP，即为成功</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220209034818.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+          <category> 脚本 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> IPv4 </tag>
+            
+            <tag> IPv6 </tag>
+            
+            <tag> WARP </tag>
+            
+            <tag> Netfilx </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>X-ui面板配置分流规则，实现一个节点访问不同网站按需分流到不同的IP</title>
+      <link href="/xui-routing/"/>
+      <url>/xui-routing/</url>
+      
+        <content type="html"><![CDATA[<p>在我们创建节点的时候，我们有时候需要把部分网站的访问IP分配到不同的路由。在X-ui面板上，我们是可以直接操作的。这篇教程就来和大家一起聊聊如何在X-ui设置分流规则，实现一个节点访问不同网站按需分流到不同的IP</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一台VPS、并已经安装X-ui和设置节点</li></ul><h2 id="部署步骤"><a href="#部署步骤" class="headerlink" title="部署步骤"></a>部署步骤</h2><ol><li>打开你的X-ui管理面板</li><li>转到面板设置→xray相关设置</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220209033115.png"></p><ol start="3"><li>以下为xray的配置模板，大家可以按照注释的内容配置xray</li></ol><p>warp linux client 配置模板</p><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line"><span class="attr">&quot;api&quot;</span>: &#123;</span><br><span class="line"><span class="attr">&quot;services&quot;</span>: [</span><br><span class="line"><span class="string">&quot;HandlerService&quot;</span>,</span><br><span class="line"><span class="string">&quot;LoggerService&quot;</span>,</span><br><span class="line"><span class="string">&quot;StatsService&quot;</span></span><br><span class="line">],</span><br><span class="line"><span class="attr">&quot;tag&quot;</span>: <span class="string">&quot;api&quot;</span></span><br><span class="line">&#125;,</span><br><span class="line"><span class="attr">&quot;inbounds&quot;</span>: [&#123;</span><br><span class="line"><span class="attr">&quot;listen&quot;</span>: <span class="string">&quot;127.0.0.1&quot;</span>,</span><br><span class="line"><span class="attr">&quot;port&quot;</span>: <span class="number">62789</span>,</span><br><span class="line"><span class="attr">&quot;protocol&quot;</span>: <span class="string">&quot;dokodemo-door&quot;</span>,</span><br><span class="line"><span class="attr">&quot;settings&quot;</span>: &#123;</span><br><span class="line"><span class="attr">&quot;address&quot;</span>: <span class="string">&quot;127.0.0.1&quot;</span></span><br><span class="line">&#125;,</span><br><span class="line"><span class="attr">&quot;tag&quot;</span>: <span class="string">&quot;api&quot;</span></span><br><span class="line">&#125;],</span><br><span class="line"><span class="attr">&quot;outbounds&quot;</span>: [&#123;</span><br><span class="line"><span class="attr">&quot;tag&quot;</span>: <span class="string">&quot;IP4-out&quot;</span>,</span><br><span class="line"><span class="attr">&quot;protocol&quot;</span>: <span class="string">&quot;freedom&quot;</span>,</span><br><span class="line"><span class="attr">&quot;settings&quot;</span>: &#123;&#125;</span><br><span class="line">&#125;,</span><br><span class="line">&#123;</span><br><span class="line"><span class="attr">&quot;tag&quot;</span>: <span class="string">&quot;IP6-out&quot;</span>,</span><br><span class="line"><span class="attr">&quot;protocol&quot;</span>: <span class="string">&quot;freedom&quot;</span>,</span><br><span class="line"><span class="attr">&quot;settings&quot;</span>: &#123;</span><br><span class="line"><span class="attr">&quot;domainStrategy&quot;</span>: <span class="string">&quot;UseIPv6&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">&#125;,</span><br><span class="line">&#123;</span><br><span class="line"><span class="attr">&quot;tag&quot;</span>: <span class="string">&quot;socks5-warp&quot;</span>,</span><br><span class="line"><span class="attr">&quot;protocol&quot;</span>: <span class="string">&quot;socks&quot;</span>,</span><br><span class="line"><span class="attr">&quot;settings&quot;</span>: &#123;</span><br><span class="line"><span class="attr">&quot;servers&quot;</span>: [&#123;</span><br><span class="line"><span class="attr">&quot;address&quot;</span>: <span class="string">&quot;127.0.0.1&quot;</span>,</span><br><span class="line"><span class="attr">&quot;port&quot;</span>: <span class="number">40000</span> <span class="comment">//warp socks5端口</span></span><br><span class="line">&#125;]</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">],</span><br><span class="line"><span class="attr">&quot;policy&quot;</span>: &#123;</span><br><span class="line"><span class="attr">&quot;system&quot;</span>: &#123;</span><br><span class="line"><span class="attr">&quot;statsInboundDownlink&quot;</span>: <span class="literal">true</span>,</span><br><span class="line"><span class="attr">&quot;statsInboundUplink&quot;</span>: <span class="literal">true</span></span><br><span class="line">&#125;</span><br><span class="line">&#125;,</span><br><span class="line"><span class="attr">&quot;routing&quot;</span>: &#123;</span><br><span class="line"><span class="attr">&quot;rules&quot;</span>: [&#123;</span><br><span class="line"><span class="attr">&quot;type&quot;</span>: <span class="string">&quot;field&quot;</span>,</span><br><span class="line"><span class="attr">&quot;outboundTag&quot;</span>: <span class="string">&quot;IP6-out&quot;</span>,</span><br><span class="line"><span class="attr">&quot;domain&quot;</span>: [<span class="string">&quot;ipget.net&quot;</span>] <span class="comment">//自定义域名走IPv6出口，例：[&quot;geosite:netflix&quot;,&quot;geosite:*****&quot;]或[&quot;netflix.com&quot;,&quot;****.**&quot;]</span></span><br><span class="line">&#125;,</span><br><span class="line">&#123;</span><br><span class="line"><span class="attr">&quot;type&quot;</span>: <span class="string">&quot;field&quot;</span>,</span><br><span class="line"><span class="attr">&quot;outboundTag&quot;</span>: <span class="string">&quot;socks5-warp&quot;</span>,</span><br><span class="line"><span class="attr">&quot;domain&quot;</span>: [<span class="string">&quot;geosite:google&quot;</span>] <span class="comment">//自定义域名走socks5 warp出口，例：[&quot;geosite:netflix&quot;,&quot;geosite:*****&quot;]或[&quot;netflix.com&quot;,&quot;****.**&quot;]</span></span><br><span class="line">&#125;,</span><br><span class="line">&#123;</span><br><span class="line"><span class="attr">&quot;type&quot;</span>: <span class="string">&quot;field&quot;</span>,</span><br><span class="line"><span class="attr">&quot;outboundTag&quot;</span>: <span class="string">&quot;IP4-out&quot;</span>,</span><br><span class="line"><span class="attr">&quot;network&quot;</span>: <span class="string">&quot;udp,tcp&quot;</span> <span class="comment">//除上述规则外，其他连接走IPv4出口</span></span><br><span class="line">&#125;,</span><br><span class="line">&#123;</span><br><span class="line"><span class="attr">&quot;inboundTag&quot;</span>: [</span><br><span class="line"><span class="string">&quot;api&quot;</span></span><br><span class="line">],</span><br><span class="line"><span class="attr">&quot;outboundTag&quot;</span>: <span class="string">&quot;api&quot;</span>,</span><br><span class="line"><span class="attr">&quot;type&quot;</span>: <span class="string">&quot;field&quot;</span></span><br><span class="line">&#125;,</span><br><span class="line">&#123;</span><br><span class="line"><span class="attr">&quot;ip&quot;</span>: [</span><br><span class="line"><span class="string">&quot;geoip:private&quot;</span></span><br><span class="line">],</span><br><span class="line"><span class="attr">&quot;outboundTag&quot;</span>: <span class="string">&quot;blocked&quot;</span>,</span><br><span class="line"><span class="attr">&quot;type&quot;</span>: <span class="string">&quot;field&quot;</span></span><br><span class="line">&#125;,</span><br><span class="line">&#123;</span><br><span class="line"><span class="attr">&quot;outboundTag&quot;</span>: <span class="string">&quot;blocked&quot;</span>,</span><br><span class="line"><span class="attr">&quot;protocol&quot;</span>: [</span><br><span class="line"><span class="string">&quot;bittorrent&quot;</span></span><br><span class="line">],</span><br><span class="line"><span class="attr">&quot;type&quot;</span>: <span class="string">&quot;field&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">]</span><br><span class="line">&#125;,</span><br><span class="line"><span class="attr">&quot;stats&quot;</span>: &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>IPv4+IPv6配置模板</p><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line"><span class="attr">&quot;api&quot;</span>: &#123;</span><br><span class="line"><span class="attr">&quot;services&quot;</span>: [</span><br><span class="line"><span class="string">&quot;HandlerService&quot;</span>,</span><br><span class="line"><span class="string">&quot;LoggerService&quot;</span>,</span><br><span class="line"><span class="string">&quot;StatsService&quot;</span></span><br><span class="line">],</span><br><span class="line"><span class="attr">&quot;tag&quot;</span>: <span class="string">&quot;api&quot;</span></span><br><span class="line">&#125;,</span><br><span class="line"><span class="attr">&quot;inbounds&quot;</span>: [&#123;</span><br><span class="line"><span class="attr">&quot;listen&quot;</span>: <span class="string">&quot;127.0.0.1&quot;</span>,</span><br><span class="line"><span class="attr">&quot;port&quot;</span>: <span class="number">62789</span>,</span><br><span class="line"><span class="attr">&quot;protocol&quot;</span>: <span class="string">&quot;dokodemo-door&quot;</span>,</span><br><span class="line"><span class="attr">&quot;settings&quot;</span>: &#123;</span><br><span class="line"><span class="attr">&quot;address&quot;</span>: <span class="string">&quot;127.0.0.1&quot;</span></span><br><span class="line">&#125;,</span><br><span class="line"><span class="attr">&quot;tag&quot;</span>: <span class="string">&quot;api&quot;</span></span><br><span class="line">&#125;],</span><br><span class="line"><span class="attr">&quot;outbounds&quot;</span>: [&#123;</span><br><span class="line"><span class="attr">&quot;tag&quot;</span>: <span class="string">&quot;IP4-out&quot;</span>,</span><br><span class="line"><span class="attr">&quot;protocol&quot;</span>: <span class="string">&quot;freedom&quot;</span>,</span><br><span class="line"><span class="attr">&quot;settings&quot;</span>: &#123;&#125;</span><br><span class="line">&#125;,</span><br><span class="line">&#123;</span><br><span class="line"><span class="attr">&quot;tag&quot;</span>: <span class="string">&quot;IP6-out&quot;</span>,</span><br><span class="line"><span class="attr">&quot;protocol&quot;</span>: <span class="string">&quot;freedom&quot;</span>,</span><br><span class="line"><span class="attr">&quot;settings&quot;</span>: &#123;</span><br><span class="line"><span class="attr">&quot;domainStrategy&quot;</span>: <span class="string">&quot;UseIPv6&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">],</span><br><span class="line"><span class="attr">&quot;policy&quot;</span>: &#123;</span><br><span class="line"><span class="attr">&quot;system&quot;</span>: &#123;</span><br><span class="line"><span class="attr">&quot;statsInboundDownlink&quot;</span>: <span class="literal">true</span>,</span><br><span class="line"><span class="attr">&quot;statsInboundUplink&quot;</span>: <span class="literal">true</span></span><br><span class="line">&#125;</span><br><span class="line">&#125;,</span><br><span class="line"><span class="attr">&quot;routing&quot;</span>: &#123;</span><br><span class="line"><span class="attr">&quot;rules&quot;</span>: [&#123;</span><br><span class="line"><span class="attr">&quot;type&quot;</span>: <span class="string">&quot;field&quot;</span>,</span><br><span class="line"><span class="attr">&quot;outboundTag&quot;</span>: <span class="string">&quot;IP6-out&quot;</span>,</span><br><span class="line"><span class="attr">&quot;domain&quot;</span>: [<span class="string">&quot;ipget.net&quot;</span>] <span class="comment">//自定义域名走IPv6出口，例：[&quot;geosite:netflix&quot;,&quot;geosite:*****&quot;]或[&quot;netflix.com&quot;,&quot;****.**&quot;]</span></span><br><span class="line">&#125;,</span><br><span class="line">&#123;</span><br><span class="line"><span class="attr">&quot;type&quot;</span>: <span class="string">&quot;field&quot;</span>,</span><br><span class="line"><span class="attr">&quot;outboundTag&quot;</span>: <span class="string">&quot;IP4-out&quot;</span>,</span><br><span class="line"><span class="attr">&quot;network&quot;</span>: <span class="string">&quot;udp,tcp&quot;</span> <span class="comment">//除上述规则外，其他连接走IPv4出口</span></span><br><span class="line">&#125;,</span><br><span class="line">&#123;</span><br><span class="line"><span class="attr">&quot;inboundTag&quot;</span>: [</span><br><span class="line"><span class="string">&quot;api&quot;</span></span><br><span class="line">],</span><br><span class="line"><span class="attr">&quot;outboundTag&quot;</span>: <span class="string">&quot;api&quot;</span>,</span><br><span class="line"><span class="attr">&quot;type&quot;</span>: <span class="string">&quot;field&quot;</span></span><br><span class="line">&#125;,</span><br><span class="line">&#123;</span><br><span class="line"><span class="attr">&quot;ip&quot;</span>: [</span><br><span class="line"><span class="string">&quot;geoip:private&quot;</span></span><br><span class="line">],</span><br><span class="line"><span class="attr">&quot;outboundTag&quot;</span>: <span class="string">&quot;blocked&quot;</span>,</span><br><span class="line"><span class="attr">&quot;type&quot;</span>: <span class="string">&quot;field&quot;</span></span><br><span class="line">&#125;,</span><br><span class="line">&#123;</span><br><span class="line"><span class="attr">&quot;outboundTag&quot;</span>: <span class="string">&quot;blocked&quot;</span>,</span><br><span class="line"><span class="attr">&quot;protocol&quot;</span>: [</span><br><span class="line"><span class="string">&quot;bittorrent&quot;</span></span><br><span class="line">],</span><br><span class="line"><span class="attr">&quot;type&quot;</span>: <span class="string">&quot;field&quot;</span></span><br><span class="line">&#125;</span><br><span class="line">]</span><br><span class="line">&#125;,</span><br><span class="line"><span class="attr">&quot;stats&quot;</span>: &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><blockquote><p>PS: Geosite支持列表可以看<a href="https://github.com/v2fly/domain-list-community/tree/master/data">这里</a></p></blockquote><ol start="4"><li>重启面板</li><li>检查节点分流效果</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220209032803.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> xui </tag>
+            
+            <tag> 节点 </tag>
+            
+            <tag> 科学上网 </tag>
+            
+            <tag> IPv4 </tag>
+            
+            <tag> IPv6 </tag>
+            
+            <tag> geosite </tag>
+            
+            <tag> 分流 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>NAT VPS使用X-ui搭建节点教程</title>
+      <link href="/natvps-xui/"/>
+      <url>/natvps-xui/</url>
+      
+        <content type="html"><![CDATA[<p>在之前的教程中，我详细介绍了如何去白嫖Hax的VPS。最近Hax站长在原来的IPv6 VPS基础上，又给我们白嫖了NAT VPS。趁着这个机会，我来详细教大家如何去使用NAT VPS，并且使用X-ui搭建节点</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一台NAT VPS</li></ul><h2 id="使用步骤"><a href="#使用步骤" class="headerlink" title="使用步骤"></a>使用步骤</h2><ol><li>进入你的主机提供商的面板，申请端口。这里我使用的是Hax刚刚出的NAT VPS，点击蓝色的“IP &amp; Port for NATVPS”按钮</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208191524.png"></p><ol start="2"><li>输入“PORT”，同意协议及通过人机验证，点击绿色的“Request Port”按钮</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208191647.png"></p><ol start="3"><li>这里会出现SSH的端口，可以使用的端口范围</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208191731.png"></p><blockquote><p>PS: 不同提供商的面板会有所差别，但大体都是一样的</p></blockquote><ol start="4"><li>使用NAT提供的SSH端口，登录VPS</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208191834.png"></p><ol start="5"><li>这里我们准备使用X-ui安装节点。执行以下代码安装X-ui</li></ol><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bash &lt;(curl -Ls https://raw.githubusercontents.com/vaxilu/x-ui/master/install.sh)</span><br></pre></td></tr></table></figure><ol start="6"><li>安装完成之后，输入<code>x-ui</code>命令进入管理菜单，更改端口</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208192511.png"></p><ol start="7"><li>成功进入面板</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208192606.png"></p><ol start="8"><li>创建一个节点，可以参考下图设置，端口一定要在可用端口范围内</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208192642.png"></p><ol start="9"><li>测试节点是否联通</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208192835.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> 白嫖 </tag>
+            
+            <tag> NAT </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>哪吒VPS探针设置Telegram Bot通知</title>
+      <link href="/nezha-tgbot/"/>
+      <url>/nezha-tgbot/</url>
+      
+        <content type="html"><![CDATA[<p>在我们的实际使用中，哪吒面板默认是没有任何的通知功能的。在本篇文章中，我来和大家一起通过Telegram机器人，实现哪吒面板TG机器人通知。</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一个Telegram账号</li></ul><h2 id="部署步骤"><a href="#部署步骤" class="headerlink" title="部署步骤"></a>部署步骤</h2><ol><li>打开<a href="https://t.me/BotFather">@BotFather</a>，按照图示创建一个新的Bot，获取API Token</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220129110433.png"></p><ol start="2"><li>打开<a href="https://t.me/userinfobot">@userinfobot</a>，获取自己的用户ID</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220129110726.png"></p><ol start="3"><li>浏览器访问以下URL</li></ol><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">https://api.telegram.org/bot&lt;你的机器人密钥&gt;/sendMessage?chat_id=&lt;你的用户ID&gt;&amp;text=tellmenow</span><br></pre></td></tr></table></figure><ol start="4"><li>不出意外的话你应该就可以看到你的机器人给你发送了一个“tellmenow”的消息</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208183443.png"></p><ol start="5"><li>进入报警，点击“添加通知方式”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208183531.png"></p><ol start="6"><li>配置如下</li></ol><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">名称：telegram机器人消息通知</span><br><span class="line">URL：https://api.telegram.org/bot&lt;你的机器人密钥&gt;/sendMessage?chat_id=&lt;你的用户ID&gt;&amp;text=#NEZHA#</span><br><span class="line">请求方式: GET</span><br><span class="line">请求类型: 默认</span><br><span class="line">Body: 空</span><br></pre></td></tr></table></figure><ol start="7"><li>设置完成后，你会收到一条信息，表明哪吒面板和tg机器人通信成功</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208183711.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 哪吒 </tag>
+            
+            <tag> 探针 </tag>
+            
+            <tag> 教程 </tag>
+            
+            <tag> VPS </tag>
+            
+            <tag> Telegram </tag>
+            
+            <tag> bot </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>TG人形自走机器人项目PagerMaid安装教程</title>
+      <link href="/pgm-userbot/"/>
+      <url>/pgm-userbot/</url>
+      
+        <content type="html"><![CDATA[<p>在Telegram电报聊天的时候，我们有时候会看到一些神奇的骚操作。这些骚操作如何实现的呢？我们又如何自己部署一个像模像样的呢？这个项目叫做PagerMaid，是一种人形自走机器人。这篇文章来和大家一起部署一个Pagermaid人形自走机器人</p><p>感谢<a href="https://github.com/Xtao-Labs/PagerMaid-Modify">Xtao-Labs&#x2F;PagerMaid-Modify</a>项目组的付出</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一台VPS，并重置为Debian &#x2F; Ubuntu系统</li><li>Telegram官方申请的APP ID和APP HASH</li></ul><h2 id="申请Telegram-APPID和APP-HASH"><a href="#申请Telegram-APPID和APP-HASH" class="headerlink" title="申请Telegram APPID和APP HASH"></a>申请Telegram APPID和APP HASH</h2><p>以下两种方式均可用</p><h3 id="通过Pagermaid官方bot获取"><a href="#通过Pagermaid官方bot获取" class="headerlink" title="通过Pagermaid官方bot获取"></a>通过Pagermaid官方bot获取</h3><ol><li>打开<a href="https://t.me/PagerMaid_Modify_bot">@PagerMaid_Modify_bot</a></li><li>输入<code>/app</code>命令</li><li>根据提示完成API创建操作</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208163531.png"></p><ol start="4"><li>复制APP ID和APP HASH，备用</li></ol><blockquote><p>PS: 此方法经过PagermMaid项目组的验证，不保证对所有账号可用</p></blockquote><h3 id="通过Telegram官网获取"><a href="#通过Telegram官网获取" class="headerlink" title="通过Telegram官网获取"></a>通过Telegram官网获取</h3><ol><li>打开<a href="http://my.telegram.org/">官网</a></li><li>输入手机号登录</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208163746.png"></p><ol start="3"><li>点击“API development tools”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208163842.png"></p><ol start="4"><li>输入应用名称，可以随便填写，点击“Create application”创建应用</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208163856.png"></p><blockquote><p>PS: 如果此步出现错误“ERROR”提示，请换用美国节点重试</p></blockquote><ol start="5"><li>复制APP ID和APP HASH，备用</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208164000.png"></p><h2 id="手动部署PagerMaid"><a href="#手动部署PagerMaid" class="headerlink" title="手动部署PagerMaid"></a>手动部署PagerMaid</h2><ol><li>SSH登录至VPS</li><li>执行以下命令，安装依赖</li></ol><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">apt-get update</span><br><span class="line">apt-get install git imagemagick libzbar-dev neofetch tesseract-ocr tesseract-ocr-eng tesseract-ocr-chi-sim redis-server python3-pip -y</span><br><span class="line">git clone https://github.com/xtaodada/PagerMaid-Modify.git pagermaid &amp;&amp; cd pagermaid</span><br><span class="line">pip3 install -r requirements.txt</span><br><span class="line">cp config.gen.yml config.yml</span><br></pre></td></tr></table></figure><ol start="3"><li>编辑<code>config.yml</code>文件，替换为自己的APP ID和APP HASH</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208164159.png"></p><ol start="4"><li>使用<code>python3 -m pagermaid</code>运行bot，进行授权登录</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208164230.png"></p><ol start="5"><li>输入<code>-help</code>命令，查看运行状态</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220208164303.png"></p><ol start="6"><li>设置守护进程</li></ol><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">cat &lt;&lt;&#x27;TEXT&#x27; &gt; /etc/systemd/system/pagermaid.service</span><br><span class="line">[Unit]</span><br><span class="line">Description=PagerMaid-Modify telegram utility daemon</span><br><span class="line">After=network.target</span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br><span class="line">[Service]</span><br><span class="line">Type=simple</span><br><span class="line">WorkingDirectory=/root/pagermaid</span><br><span class="line">ExecStart=/usr/bin/python3 -m pagermaid</span><br><span class="line">Restart=always</span><br><span class="line">TEXT</span><br></pre></td></tr></table></figure><blockquote><p>PS: WorkingDirectory请按自己的环境配置</p></blockquote><ol start="7"><li>启动程序：<code>systemctl start pagermaid</code>；设置为开机自启：<code>systemctl enable pagermaid</code>；停止程序：<code>systemctl stop pagermaid</code></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 教程 </tag>
+            
+            <tag> VPS </tag>
+            
+            <tag> Telegram </tag>
+            
+            <tag> TG </tag>
+            
+            <tag> PagerMaid </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>GitHub x Pages with CI 搭建静态化Hexo博客</title>
+      <link href="/hexoci/"/>
+      <url>/hexoci/</url>
+      
+        <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本篇博客为Lian Zhou代打，会讲一讲Misaka No的博客现在的架构以及如何做一个差不多的博客。</p><h2 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h2><p>如果使用Hexo等静态页面生成器来构建个人博客的话肯定是建议使用Git + CI来进行储存+构建，因为如果静态博客一直在本地拖沓着没有版本控制&#x2F;备份再加上NodeJS等解释器语言模块化的特性，用不了多久一直在本地部署的博客就会变得臃肿不看，甚至歇菜。<br>所以在这里推荐两种方式来部署，都用到了GitHub作为储存库，区别在于是使用CloudFlare Pages还是使用Github Pages来部署&#x2F;分发页面。<br>而写这篇文章不仅是要讲讲这两种方法，也是对目前互联网上繁杂的信息做一个汇总，对现有的文章讲的东西进行优化之后再写的。</p><h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>使用两种方法都需要的先决条件就是有一个GitHub储存库，里面放着我们Hexo的源文件。<br>按图中大致方式创建一个私有储存库储存库，如果使用公开储存库则会让别人轻松地访问到我们博客的源文件，日后遇到版权纠纷就难说了。<br><img src="https://i.w3tt.com/2022/02/08/TSIVB.png" alt="TSIVB.png"><br>创建好后，我们把这个库Clone到本地，这里建议使用GitHub Desktop进行操作。<br><img src="https://i.w3tt.com/2022/02/08/TSCos.png" alt="TSCos.png"><br>类似于这样，很方便地进行一个Clone。<br><img src="https://i.w3tt.com/2022/02/08/TSwrK.png" alt="TSwrK.png"><br>Clone之后我们打开本地的文件夹，在该文件打开终端，进行hexo的配置。<br>当然因为这个文件夹不是空的，所以我们无法直接在里面进行Init，我们先随便找一个空文件夹执行</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo -g</span><br><span class="line">hexo init</span><br></pre></td></tr></table></figure><p>然后把这个文件夹内的东西移动到我们的Git文件夹<br><img src="https://i.w3tt.com/2022/02/08/T0MQa.png" alt="T0MQa.png"><br>最后像这样，然后再按照个人需求进行配置，这里不多赘述。<br>配置完成后我们将源文件Push到GitHub。<br><img src="https://i.w3tt.com/2022/02/08/T0O3S.png" alt="T0O3S.png"><br>回到GitHub Desktop我们可以发现更改已经可以提交了，在留言处随意写点什么然后commit即可，提交后我们发现旁边多出一个Push按钮，点击即可将更改推送到GitHub。<br>然后前置准备就完成了，让我们进入下一步。</p><h2 id="CloudFlare-Pages"><a href="#CloudFlare-Pages" class="headerlink" title="CloudFlare Pages"></a>CloudFlare Pages</h2><p>这里先讲CFP的原因是这种方法相对于使用GitHub AC来部署会更简单易用，而且CF的CDN并不比GitHub慢，在SSL配置速度上甚至优于GitHub Pages。<br>下面是配置方法。<br>打开CloudFlare面板，进入Pages，添加一个站点。<br>按指引将自己的GitHub账户与CloudFlare连接起来后就可以选择储存库了，选择源文件所在的储存库，继续<br><img src="https://i.w3tt.com/2022/02/08/T0oiN.png" alt="T0oiN.png"><br>按图上配置填写自动构建信息，保存并部署，然后就可以看到CloudFlare自动帮我们部署站点，坐等三分钟即可。<br>部署完成后添加自定义域名也是十分的方便，无论域名是否接入CloudFlare都可以绑定到Pages上，如果域名是绑定在CloudFlare上的那CF还会帮我们搞定域名绑定。<br>自此，以后我们无论从何处向该储存库提交文章，CloudFlare Pages都会第一时间构建并发布我们的博客，十分方便。<br><img src="https://i.w3tt.com/2022/02/08/T0qtC.png" alt="T0qtC.png"><br>我们也可以在GitHub查看每一次提交对应的部署是否成功，在CloudFlare还可以对部署进行回滚等操作。</p><h2 id="GitHub-Actions-X-Pages"><a href="#GitHub-Actions-X-Pages" class="headerlink" title="GitHub Actions X Pages"></a>GitHub Actions X Pages</h2><p>如果想全流程使用GitHub的话那我们也可以选择使用GitHub Actions作为CI自动构建，Pages作为PaaS来分发的方式来搭建Hexo博客。<br>首先我们需要为Actions准备一份SSH密钥作为其CI部署时向储存库提交更改的凭据。<br>来到一个Linux系统的终端，执行 <code>ssh-keygen -f hexocidemo</code>（-f 后的字段可自定义）<br>一路回车完毕后如图所示<br><img src="https://i.w3tt.com/2022/02/08/T052L.png" alt="T052L.png"><br>我们可以发现在这个目录多了两个文件，一个带有<code>.pub</code>后缀，一个没有，有后缀的为公钥，没有的为私钥，两个都留着备用。<br>打开GitHub，为Pages创建一个公开仓库（如果有GitHub Pro&#x2F;Team&#x2F;Enterprise那也可以是私有仓库），如下图所示<br><img src="https://i.w3tt.com/2022/02/08/T0Tbi.png" alt="T0Tbi.png"><br>其中 <code>github.io</code> 前应为你的GitHub用户名&#x2F;组织名以便获得无后缀的Pages入口。<br><img src="https://i.w3tt.com/2022/02/08/T0UgX.png" alt="T0UgX.png"><br>随便创建个文件，来到设置里发现已经自动开启了GitHub Pages<br><img src="https://i.w3tt.com/2022/02/08/T0WVt.png" alt="T0WVt.png"><br>接下来按图上流程添加一个公钥到仓库，内容是我们刚刚创建的公钥（请将文件内容一字不差地复制进去），然后保存。不要忘记勾选允许写入权限。<br><img src="https://i.w3tt.com/2022/02/08/T0kqx.png" alt="T0kqx.png"><br>然后想这样，把Git仓库的SSH信息复制走，备用。<br>之后回到我们刚刚存放源文件的私有库<br><img src="https://i.w3tt.com/2022/02/08/T0xrj.png" alt="T0xrj.png"><br>按流程添加对应公开仓库公钥的私钥，名称自定义。<br>来到<code>_config.yml</code>，修改<code>deploy</code>配置</p><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">deploy:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">git</span></span><br><span class="line">  <span class="attr">repo:</span> <span class="string">&lt;刚刚复制的SSH信息&gt;</span></span><br><span class="line">  <span class="attr">branch:</span> <span class="string">main</span></span><br></pre></td></tr></table></figure><p>然后打开<code>package.json</code><br>在<code>&quot;dependencies&quot;</code>里加入<code>&quot;hexo-deployer-git&quot;: &quot;^3.0.0&quot;</code>，保存<br>新建目录&#x2F;文件 <code>.github/workflows/HexoCI.yml</code><br>在文件内写入如下</p><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">CI</span></span><br><span class="line"><span class="attr">on:</span></span><br><span class="line">  <span class="attr">push:</span></span><br><span class="line">    <span class="attr">branches:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">main</span></span><br><span class="line"><span class="attr">jobs:</span></span><br><span class="line">  <span class="attr">build:</span></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-latest</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Checkout</span> <span class="string">source</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">actions/checkout@v1</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">ref:</span> <span class="string">main</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Setup</span> <span class="string">NodeJS</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">actions/setup-node@v2</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">node-version:</span> <span class="string">$&#123;&#123;</span> <span class="string">matrix.node_version</span> <span class="string">&#125;&#125;</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Setup</span> <span class="string">Hexo</span></span><br><span class="line">        <span class="attr">env:</span></span><br><span class="line">          <span class="attr">ACTION_DEPLOY_KEY:</span> <span class="string">$&#123;&#123;</span> <span class="string">secrets.&lt;刚刚的私钥的名字&gt;</span> <span class="string">&#125;&#125;</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">|</span></span><br><span class="line"><span class="string">          mkdir -p ~/.ssh/</span></span><br><span class="line"><span class="string">          echo &quot;$ACTION_DEPLOY_KEY&quot; &gt; ~/.ssh/id_rsa</span></span><br><span class="line"><span class="string">          chmod 600 ~/.ssh/id_rsa</span></span><br><span class="line"><span class="string">          ssh-keyscan github.com &gt;&gt; ~/.ssh/known_hosts</span></span><br><span class="line"><span class="string">          git config --global user.email &quot;&lt;Your Email&gt;&quot;</span></span><br><span class="line"><span class="string">          git config --global user.name &quot;&lt;Your NickName&gt;&quot;</span></span><br><span class="line"><span class="string">          npm install hexo-cli -g</span></span><br><span class="line"><span class="string">          npm install</span></span><br><span class="line"><span class="string">          sudo timedatectl set-timezone Asia/Shanghai</span></span><br><span class="line"><span class="string"></span>      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Deploy</span> <span class="string">Hexo</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">|</span></span><br><span class="line"><span class="string">          hexo clean</span></span><br><span class="line"><span class="string">          hexo d</span></span><br></pre></td></tr></table></figure><p>不要忘记替换掉里面 <code>&lt;&gt;</code> 引出的内容<br>然后提交，不出意外就部署成功了<br><img src="https://i.w3tt.com/2022/02/08/T0zQp.png" alt="T0zQp.png"><br>进入Actions查看，14s就部署完成了，还是很快的。<br><img src="https://i.w3tt.com/2022/02/08/T0FCU.png" alt="T0FCU.png"><br>进入Public库查看，提交已经完成了。</p><h2 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h2><p>为了方便大家参照，我把本次部署的所有仓库设置为了公开仓库以供查看。<br>源文件仓库:<a href="https://github.com/KaguyaCloud/HexoSiteDemo-CI">https://github.com/KaguyaCloud/HexoSiteDemo-CI</a><br>GitHub Pages仓库:<a href="https://github.com/KaguyaCloud/kaguyacloud.github.io">https://github.com/KaguyaCloud/kaguyacloud.github.io</a><br>CloudFlare Pages部署:<a href="https://hexositedemo-ci.pages.dev/">https://hexositedemo-ci.pages.dev/</a><br>最后说两句，一个Git托管，CI构建的博客远没有想想中的复杂，现在PaaS也在激烈内卷，相信未来会有更多的Pages形式&#x2F;云函数形式的PaaS提供商出现，CI的门槛也会越来越低。并且从防攻击的角度来说，一个托管在PaaS上的静态博客也算是无懈可击了。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> CloudFlare </tag>
+            
+            <tag> GitHub </tag>
+            
+            <tag> Hexo </tag>
+            
+            <tag> 博客 </tag>
+            
+            <tag> Pages </tag>
+            
+            <tag> 静态页面 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Linux系统安装Go编程环境</title>
+      <link href="/golang-linux-install/"/>
+      <url>/golang-linux-install/</url>
+      
+        <content type="html"><![CDATA[<p>在我们第一次接触go这个语言中，我们肯定要先在本机&#x2F;服务器部署golang环境。下面我来简单记录下go编程环境在Linux服务器上的安装方法</p><ol><li>打开<a href="https://go.dev/dl/">Go官网</a>，检查最新版本</li><li>使用wget命令下载压缩包</li></ol><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://go.dev/dl/go1.17.6.linux-amd64.tar.gz</span><br></pre></td></tr></table></figure><blockquote><p>PS: 截至本文发布前，go的版本是1.17.6</p></blockquote><ol start="3"><li>解压压缩包到<code>/usr/local</code>下</li></ol><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tar -C /usr/local -xzf go1.17.6.linux-amd64.tar.gz</span><br></pre></td></tr></table></figure><ol start="4"><li>设置go的环境变量</li></ol><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export PATH=$PATH:/usr/local/go/bin</span><br></pre></td></tr></table></figure><ol start="5"><li>刷新环境变量</li></ol><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">source $HOME/.profile</span><br></pre></td></tr></table></figure><ol start="6"><li>检查go安装状态</li></ol><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">go version</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> 编程 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 编程 </tag>
+            
+            <tag> go </tag>
+            
+            <tag> 环境 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>使用HE Tunnel Broker给你的IPv4 VPS添加隧道</title>
+      <link href="/he-tunnel-v6/"/>
+      <url>/he-tunnel-v6/</url>
+      
+        <content type="html"><![CDATA[<p>在部分时候，我们需要使用IPv6的资源，但是部分抠门的VPS提供商是没有提供免费IPv6地址或压根没有提供IPv6地址。那么本教程就来叫大家如何使用He Tunnel Broker隧道服务来使用IPv6资源。</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一台IPv4的VPS，系统为Debian &#x2F; Ubuntu</li></ul><h2 id="部署步骤"><a href="#部署步骤" class="headerlink" title="部署步骤"></a>部署步骤</h2><ol><li>打开<a href="https://tunnelbroker.net/">官网</a></li><li>注册一个账号</li><li>点击左下角的“Create Regular Tunnel”</li><li>输入你的VPS的IPv4地址，选择隧道服务器（最好选择离你的VPS服务器地区最近的地区），点击“Create Tunnel”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220207115623.png"></p><ol start="5"><li>在这里就可以看到隧道信息了</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220207115803.png"></p><ol start="6"><li>转到“Example Configuration”，查看关于Debian &#x2F; Ubuntu系统的配置</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220207115832.png"></p><ol start="7"><li>SSH登录至VPS</li><li>修改<code>/etc/network/interfaces</code>文件，在后面加上第6步获取的配置</li><li>使用以下命令，安装依赖</li></ol><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install net-tools iproute2 ifupdown -y</span><br></pre></td></tr></table></figure><ol start="10"><li>使用以下命令，启用IPv6隧道</li></ol><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ifup he-ipv6</span><br></pre></td></tr></table></figure><ol start="11"><li>使用<code>ifconfig</code>命令查看网络配置情况，如出现he-ipv6接口即为成功</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220207120300.png"></p><blockquote><p>若没有生效可以尝试使用<code>sudo systemctl restart networking</code>重启网络</p></blockquote><ol start="12"><li>使用以下命令，禁用IPv6隧道</li></ol><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ifdown he-ipv6</span><br></pre></td></tr></table></figure><ol start="13"><li>再次修改<code>/etc/network/interfaces</code>文件，从<code>auto he-ipv6</code>开始删除</li><li>删除隧道成功</li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> 隧道 </tag>
+            
+            <tag> Tunnel </tag>
+            
+            <tag> HE </tag>
+            
+            <tag> IPv4 </tag>
+            
+            <tag> IPv6 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>思科Cisco Devbox使用教程</title>
+      <link href="/cisco-devbox/"/>
+      <url>/cisco-devbox/</url>
+      
+        <content type="html"><![CDATA[<p>在我们的实际开发中，难免需要使用沙盒环境进行测试。思科这家公司很大方的为开发者推出了许多不同类型的沙盒。在本文章中我就来教大家如何去使用思科的沙盒。</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>思科的Anyconnect VPN（用于连接沙盒用）</li></ul><h2 id="步骤方法"><a href="#步骤方法" class="headerlink" title="步骤方法"></a>步骤方法</h2><h3 id="申请沙盒"><a href="#申请沙盒" class="headerlink" title="申请沙盒"></a>申请沙盒</h3><ol><li>打开<a href="https://developer.cisco.com/site/sandbox/">官网</a></li><li>点击“进入沙盒”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206150846.png"></p><ol start="3"><li>在这里可以使用多平台的账号注册登录，我这里就用我自己的Github账号登录思科沙盒</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206151251.png"></p><ol start="4"><li>待登录成功后，进入沙盒选择页面。</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206151405.png"></p><ol start="5"><li>我这里就以Devbox沙盒为例，进入沙盒页面，点击右上角的“Reserve”申请沙盒</li><li>等待10-20分钟进行沙盒设置操作</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206151543.png"></p><h3 id="下载并安装思科Anyconnect-VPN"><a href="#下载并安装思科Anyconnect-VPN" class="headerlink" title="下载并安装思科Anyconnect VPN"></a>下载并安装思科Anyconnect VPN</h3><ol><li>打开<a href="https://developer.cisco.com/site/devnet/sandbox/anyconnect/">下载页面</a></li><li>选择你自己系统的版本进行下载。</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206151720.png"></p><ol start="3"><li>安装红框内安装包</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206151803.png"></p><ol start="4"><li>安装完成后，备用</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206151852.png"></p><h3 id="连接沙盒"><a href="#连接沙盒" class="headerlink" title="连接沙盒"></a>连接沙盒</h3><ol><li><p>待部署完成后，查看Output内的信息。这就是待会我们要使用思科Anyconnect VPN连接上沙盒网络的凭证</p></li><li><p>打开思科Anyconnect VPN</p></li><li><p>输入连接地址</p></li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206152406.png"></p><ol start="4"><li>在接下来的提示框内，输入刚刚显示的用户名密码</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220207092741.png"></p><ol start="5"><li>连接沙盒网络成功</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220207092800.png"></p><ol start="6"><li>使用沙盒内的登录信息，使用Xshell连接至VPS，连接成功</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220207092841.png"></p><ol start="7"><li>使用远程桌面连接至VPS，连接成功</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220207092915.png"></p><ol start="8"><li>跑个测试看看（由于没root权限没办法安装speedtest cli测速）</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220207093057.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> Devbox </tag>
+            
+            <tag> Cisco </tag>
+            
+            <tag> 思科 </tag>
+            
+            <tag> 开发环境 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>自定义SSH登录信息</title>
+      <link href="/customize-sshlogininfo/"/>
+      <url>/customize-sshlogininfo/</url>
+      
+        <content type="html"><![CDATA[<p>在我们使用一些服务商的VPS中，SSH登录至VPS会看到一些又臭又长的公告。这些在SSH登录时出现的公告如何实现的呢？下面我们来一起学习如何自定义登录信息</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一段你准备的文本</li><li>一台VPS</li></ul><h2 id="部署步骤"><a href="#部署步骤" class="headerlink" title="部署步骤"></a>部署步骤</h2><ol><li>准备好你需要自定义的文本内容，我这里就以德鸡的登录提示来为例吧</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220207085710.png"></p><ol start="2"><li>SSH进入VPS，可以看到我现在VPS是没有登录信息的</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220207090004.png"></p><ol start="3"><li>使用文件管理打开<code>/etc</code>文件夹内的<code>motd</code>文件</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220207090107.png"></p><ol start="4"><li>编辑里面的内容</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220207090213.png"></p><ol start="5"><li>重新登录至VPS，大功告成</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220207090310.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> SSH </tag>
+            
+            <tag> 登录信息 </tag>
+            
+            <tag> 自定义 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>免费在线浏览器hyperbeam，支持共享</title>
+      <link href="/hyperbeam/"/>
+      <url>/hyperbeam/</url>
+      
+        <content type="html"><![CDATA[<p>在疫情期间，我们的生活受到了翻天覆地的变化。我们有时候想和朋友共享看电影，但是可能带宽达不到共享屏幕的要求。国外的一家公司看到了这个需求，就开发了一个在线浏览器产品——Hyperbeam</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><p>一枚邮箱</p><h2 id="步骤方法"><a href="#步骤方法" class="headerlink" title="步骤方法"></a>步骤方法</h2><ol><li>打开<a href="https://hyperbeam.com/">官网</a></li><li>点击右上角的“Login”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206121607.png"></p><ol start="3"><li>有账号的可以直接在这里登录，这里点击“Create an account”注册账号</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206121645.png"></p><ol start="4"><li>输入出生日期</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206121912.png"></p><ol start="5"><li>输入邮箱，密码</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206121948.png"></p><ol start="6"><li>输入邮箱验证码</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206122041.png"></p><ol start="7"><li>点击“Create room”按钮</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206122140.png"></p><ol start="8"><li>输入房间名，点击“Create”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206122247.png"></p><ol start="9"><li>这是Hyperbeam对你的房间进行生成的邀请链接</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206122317.png"></p><ol start="10"><li>进入房间主页面</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206122400.png"></p><ol start="11"><li>IP地址和测速信息</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206122419.png"></p><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206122530.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 在线浏览器 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Hyperbeam </tag>
+            
+            <tag> 浏览器 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>在fastssh申请v2ray节点</title>
+      <link href="/fastssh-dynamicv2/"/>
+      <url>/fastssh-dynamicv2/</url>
+      
+        <content type="html"><![CDATA[<p>在我们之前提到了Hax，Hax是一家站长用爱发电免费VPS白嫖网站。其实站长还运营着一些为印尼人创建的节点站。这篇文章主要来教大家如何在站长的fastssh网站下创建v2ray节点</p><h2 id="步骤方法"><a href="#步骤方法" class="headerlink" title="步骤方法"></a>步骤方法</h2><ol><li>打开<a href="https://www.fastssh.com/">官网</a></li><li>点击“Dynamic Servers”下方的“Dynamic V2ray Server”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206104247.png"></p><ol start="3"><li>可以看到，目前可以用的节点是Vultr的新加坡和美国节点</li><li>在对应的服务器下面点击“Create an account”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206104427.png"></p><ol start="5"><li>输入用户名，SNI&#x2F;Bug host不用填（这个是给印尼人免流用的），点击“Create account”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206104626.png"></p><ol start="6"><li>节点创建成功，可以复制Vmess链接或使用手机扫描下面的二维码导入节点</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206104835.png"></p><h2 id="官方频道-x2F-讨论组"><a href="#官方频道-x2F-讨论组" class="headerlink" title="官方频道&#x2F;讨论组"></a>官方频道&#x2F;讨论组</h2><p>Telegram 频道：<a href="https://t.me/JoinFastSSH">@JoinFastSSH</a><br>Telegram 群组：<a href="https://t.me/hellofastssh">@hellofastssh</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 免费节点 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 节点 </tag>
+            
+            <tag> 科学上网 </tag>
+            
+            <tag> v2ray </tag>
+            
+            <tag> fastssh </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>在Howdy.id申请Trojan节点</title>
+      <link href="/howdyid-trojan/"/>
+      <url>/howdyid-trojan/</url>
+      
+        <content type="html"><![CDATA[<p>在我们之前提到了Hax，Hax是一家站长用爱发电免费VPS白嫖网站。其实站长还运营着一些为印尼人创建的节点站。这篇文章主要来教大家如何在站长的Howdy.id下创建Trojan节点</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一枚Telegram账号</li></ul><h2 id="步骤方法"><a href="#步骤方法" class="headerlink" title="步骤方法"></a>步骤方法</h2><ol><li>打开<a href="https://howdy.id/">官网</a></li><li>点击右上角的“Register”注册</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206080445.png"></p><ol start="3"><li>在TG搜索<a href="https://t.me/HowdyAuthenticatorBot">@HowdyAuthenticatorBot</a>，启动，输入“&#x2F;getid”获取自己的TG账号的ID</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206080723.png"></p><ol start="4"><li>输入TG账号ID和你的邮箱，点击“Submit”。既然是Hax站长的站，肯定是和Hax注册差不多的机制</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206080905.png"></p><ol start="5"><li>稍后Bot就会在你的私信发送一串代码，复制粘贴到Howdy的注册网页，输入密码，选择国家为中国，点击“Submit”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206081007.png"></p><ol start="6"><li>这点和Hax有个不同就是需要邮箱验证，点击邮箱验证的按钮</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206081230.png"></p><ol start="7"><li>稍后你的邮箱就会有一封Howdy.id的验证邮件，点击“Active Account”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206081327.png"></p><ol start="8"><li>点击“Trojan VPN”</li><li>这里会有两个选项，“Trojan VPN without expiration (Quota Based)”是每个账号只有15G的使用流量，“Unlimited Trojan - New Server every week”是无限流量，每周都会更新服务器地址，这里选第二个</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206081549.png"></p><ol start="10"><li>可以看到有三个新加坡服务器可以选择（话说我做这篇文章站长都还在咕咕咕没换服务器呢）</li><li>选择一个服务器</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206081937.png"></p><ol start="12"><li>输入Username和Password，SNI&#x2F;Bug host不用填（这个是给印尼人免流用的）</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206082250.png"></p><ol start="13"><li>可以看到已经创建好节点了，复制节点信息</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206082334.png"></p><ol start="14"><li>测试真延迟</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220206082419.png"></p><h2 id="官方频道-x2F-讨论组"><a href="#官方频道-x2F-讨论组" class="headerlink" title="官方频道&#x2F;讨论组"></a>官方频道&#x2F;讨论组</h2><p>Telegram 频道：<a href="https://t.me/JoinFastSSH">@JoinFastSSH</a><br>Telegram 群组：<a href="https://t.me/hellofastssh">@hellofastssh</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 免费节点 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 节点 </tag>
+            
+            <tag> 科学上网 </tag>
+            
+            <tag> Trojan </tag>
+            
+            <tag> Howdyid </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>通过Teredo隧道实现访问IPv6</title>
+      <link href="/ipv6-teredo/"/>
+      <url>/ipv6-teredo/</url>
+      
+        <content type="html"><![CDATA[<p>在部分时候，我们需要使用IPv6的资源，但是一般来说，我们本地是没有IPv6地址。那么本教程就来叫大家如何打开Teredo隧道来使用IPv6资源。</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一台Windows的电脑</li></ul><h2 id="步骤方法"><a href="#步骤方法" class="headerlink" title="步骤方法"></a>步骤方法</h2><ol><li>打开命令行，输入以下命令</li></ol><figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">netsh interface teredo <span class="built_in">set</span> state enterpriseclient server=default</span><br></pre></td></tr></table></figure><ol start="2"><li>检测IPv6连接状态，应该会如下图所示。这是因为某历害国屏蔽了默认的Teredo隧道服务器。</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220202115944.png"></p><ol start="3"><li>输入以下命令，设置备用服务器</li></ol><figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">netsh interface teredo <span class="built_in">set</span> state server=teredo.remlab.<span class="built_in">net</span></span><br></pre></td></tr></table></figure><ol start="4"><li>现在可以联通IPv6的网站了</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220202154437.png"></p><ol start="5"><li>输入以下命令，禁用Teredo隧道</li></ol><figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">netsh interface teredo <span class="built_in">set</span> state disable</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> 隧道 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 隧道 </tag>
+            
+            <tag> IPv6 </tag>
+            
+            <tag> teredo </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>甲骨文云Oracle Cloud修改实例的IP</title>
+      <link href="/oracle-changeip/"/>
+      <url>/oracle-changeip/</url>
+      
+        <content type="html"><![CDATA[<p>在我们的实际使用VPS的过程中，我们的IP有可能不小心被泄露、或者是被某个历害国给拉黑。这种情况我们就应该去给实例更换一个ip地址。在Oracle Cloud中，他们非常大方地推出了可以无限次数的更换IP的服务，实现我们想要的目的。</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>甲骨文账号</li><li>开启了至少一个实例</li></ul><h2 id="步骤方法"><a href="#步骤方法" class="headerlink" title="步骤方法"></a>步骤方法</h2><ol><li>登录<a href="https://www.oracle.com/cloud/sign-in.html?intcmp=OcomFreeTier&source=CloudFree_CTA1_Default">控制面板</a></li><li>在控制台更改为中文</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126102416.png"></p><ol start="3"><li>进入菜单，依次点击“计算”→“实例”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126103309.png"></p><ol start="4"><li>进入实例，点击“附加的VNIC”，点击默认的VNIC</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126162249.png"></p><ol start="5"><li>依次点击“IPv4地址”→“编辑”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220201095438.png"></p><ol start="6"><li>点击“没有公共IP”，点击“更新”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220201095520.png"></p><ol start="7"><li>再次编辑，点击“临时公共IP”，更新</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220201095605.png"></p><ol start="8"><li>可以在控制台看到IP已经更换</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220201095836.png"></p><ol start="9"><li>对于IPv6地址，先删除原有的IPv6地址</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220201095952.png"></p><ol start="10"><li>输入“:”+四位数字，点击“分配”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126163847.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> Oracle </tag>
+            
+            <tag> 甲骨文 </tag>
+            
+            <tag> IP </tag>
+            
+            <tag> OracleCloud </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Heroku部署V2ray节点教程</title>
+      <link href="/herov2/"/>
+      <url>/herov2/</url>
+      
+        <content type="html"><![CDATA[<p>Heroku是一个支持多种编程语言的云平台即服务。在这篇教程中，我来和大家一起在Heroku这个免费的容器上搭建V2ray节点，实现科学上网的需要。</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一枚GitHub账号</li><li>一枚Heroku账号</li><li>一枚CloudFlare账号</li></ul><h2 id="部署步骤"><a href="#部署步骤" class="headerlink" title="部署步骤"></a>部署步骤</h2><ol><li>注册好GitHub账号</li><li>打开<a href="https://github.com/DaoChen6/Heroku-v2ray">仓库</a>，并Fork一份</li><li>进入“Settings”，输入名称，改名</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220129225241.png"></p><ol start="4"><li>将README.md中的部署链接的的原仓库地址改成自己的仓库地址</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220129225333.png"></p><ol start="5"><li>注册并登录Heroku账号</li><li>输入名称和生成的UUID，没有可以从<a href="https://www.uuidgenerator.net/">这里</a>生成一个，输入节点类型，点击“Deploy APP”等待部署完成</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220129225506.png"></p><ol start="7"><li>注册并登录<a href="https://www.cloudflare.com/">CloudFlare</a>账号</li><li>点击Workers，点击“Create Service”按钮</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220129225744.png"></p><ol start="9"><li>输入自己想要的名称，其他默认，点击“Create Service”按钮</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220129225817.png"></p><ol start="10"><li>点击“Quick Edit”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220129225915.png"></p><ol start="11"><li>复制以下代码，粘贴到Worker中</li></ol><p>单账号</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">addEventListener(</span><br><span class="line">    <span class="string">&quot;fetch&quot;</span>,<span class="function"><span class="params">event</span> =&gt;</span> &#123;</span><br><span class="line">        <span class="keyword">let</span> url=<span class="keyword">new</span> URL(event.request.url);</span><br><span class="line">        url.hostname=<span class="string">&quot;appname.herokuapp.com&quot;</span>;</span><br><span class="line">        <span class="keyword">let</span> request=<span class="keyword">new</span> Request(url,event.request);</span><br><span class="line">        event. respondWith(</span><br><span class="line">            fetch(request)</span><br><span class="line">        )</span><br><span class="line">    &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure><p>双账号</p><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> SingleDay = <span class="string">&#x27;app0.herokuapp.com&#x27;</span></span><br><span class="line"><span class="keyword">const</span> DoubleDay = <span class="string">&#x27;app1.herokuapp.com&#x27;</span></span><br><span class="line">addEventListener(</span><br><span class="line">    <span class="string">&quot;fetch&quot;</span>,<span class="function"><span class="params">event</span> =&gt;</span> &#123;</span><br><span class="line">    </span><br><span class="line">        <span class="keyword">let</span> nd = <span class="keyword">new</span> <span class="built_in">Date</span>();</span><br><span class="line">        <span class="keyword">if</span> (nd.getDate()%<span class="number">2</span>) &#123;</span><br><span class="line">            host = SingleDay</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            host = DoubleDay</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">let</span> url=<span class="keyword">new</span> URL(event.request.url);</span><br><span class="line">        url.hostname=host;</span><br><span class="line">        <span class="keyword">let</span> request=<span class="keyword">new</span> Request(url,event.request);</span><br><span class="line">        event. respondWith(</span><br><span class="line">            fetch(request)</span><br><span class="line">        )</span><br><span class="line">    &#125;</span><br><span class="line">)</span><br></pre></td></tr></table></figure><ol start="12"><li>点击“Save and deploy”，点击“Send”按钮</li><li>出现200OK即为成功反代</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220129230144.png"></p><ol start="14"><li>转到V2rayN，设置一个服务器，如图所示</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220129230539.png"></p><blockquote><p>PS: 不会优选IP？看<a href="https://owo.misaka.rest/cf-ip/">这里</a></p></blockquote><ol start="15"><li>设置完成</li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> 脚本 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 节点 </tag>
+            
+            <tag> 科学上网 </tag>
+            
+            <tag> Heroku </tag>
+            
+            <tag> V2ray </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>青龙面板安装教程</title>
+      <link href="/qinglong-install/"/>
+      <url>/qinglong-install/</url>
+      
+        <content type="html"><![CDATA[<p>青龙面板是支持python3、javaScript、shell、typescript的定时任务管理面板，支持多种脚本语言（python3、javaScript、shell、typescript）、在线管理脚本、环境变量、配置文件、支持在线查看任务日志、支持秒级任务设置、支持系统级通知、支持暗黑模式、支持手机端操作。这篇文章来教大家在VPS上搭建青龙面板</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一台VPS</li></ul><h2 id="安装过程"><a href="#安装过程" class="headerlink" title="安装过程"></a>安装过程</h2><ol><li>SSH登录至VPS</li><li>使用以下命令安装Docker</li></ol><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -fsSL https://get.docker.com | bash -s docker --mirror Aliyun</span><br></pre></td></tr></table></figure><ol start="3"><li>使用以下命令拉取青龙面板的Docker镜像</li></ol><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">docker run -dit \</span><br><span class="line">    -v $PWD/ql/config:/ql/config \</span><br><span class="line">    -v $PWD/ql/log:/ql/log \</span><br><span class="line">    -v $PWD/ql/db:/ql/db \</span><br><span class="line">    -v $PWD/ql/repo:/ql/repo \</span><br><span class="line">    -v $PWD/ql/raw:/ql/raw \</span><br><span class="line">    -v $PWD/ql/scripts:/ql/scripts \</span><br><span class="line">    -p 5700:5700 \</span><br><span class="line">    --name qinglong \</span><br><span class="line">    --hostname qinglong \</span><br><span class="line">    --restart unless-stopped \</span><br><span class="line">    whyour/qinglong:latest</span><br></pre></td></tr></table></figure><blockquote><p>PS: 推荐大家使用<a href="https://github.com/Misaka-blog/MisakaLinuxToolbox">博客的工具箱</a>安装青龙面板，安装命令更快！</p></blockquote><ol start="4"><li>安装完成后，浏览器打开“<a href="http://ip地址:5700”（http://[ipv6地址]:5700）访问面板">http://ip地址:5700”（http://[ipv6地址]:5700）访问面板</a></li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220129110620.png"></p><ol start="5"><li>打开<a href="https://t.me/BotFather">@BotFather</a>，按照图示创建一个新的Bot，获取API Token</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220129110433.png"></p><ol start="6"><li>打开<a href="https://t.me/userinfobot">@userinfobot</a>，获取自己的用户ID</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220129110726.png"></p><ol start="7"><li>通知方式选择Telegram机器人，输入获取到的API Token和你的Telegram UserID</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220129110859.png"></p><ol start="8"><li>如无意外，你的Telegram机器人应该向你发送了这样的消息</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220129110951.png"></p><ol start="9"><li>设置用户名和密码</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220129111102.png"></p><ol start="10"><li>青龙面板安装完成</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220129111146.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+          <category> 脚本 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> 青龙面板 </tag>
+            
+            <tag> docker </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>甲骨文Oracle Cloud启用IPv6地址</title>
+      <link href="/oracle-ipv6/"/>
+      <url>/oracle-ipv6/</url>
+      
+        <content type="html"><![CDATA[<p>在部分时候，我们需要在甲骨文Oracle Cloud使用IPv6的资源。这篇文章主要来讲如何给Oracle Cloud实例启用IPv6的方法。</p><ol><li>登录<a href="https://www.oracle.com/cloud/sign-in.html?intcmp=OcomFreeTier&source=CloudFree_CTA1_Default">控制面板</a></li><li>在控制台更改为中文</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126102416.png"></p><ol start="3"><li>进入菜单，依次点击“网络”→“虚拟云网络”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126153923.png"></p><ol start="4"><li>进入默认创建好的云网络块</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126154622.png"></p><ol start="5"><li>依次点击“CIDR块”→“添加IPv6 CIDR块”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126161015.png"></p><ol start="6"><li>依次点击“子网”→“编辑”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126161128.png"></p><ol start="7"><li>勾选“启用IPv6 CIDR块”，输入一个00-FF之间的字符，点击“保存更改”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126161231.png"></p><ol start="8"><li>点击“路由表”，点击默认创建的路由</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126162704.png"></p><ol start="9"><li>点击“添加路由规则”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126162739.png"></p><ol start="10"><li>按照下图设置</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126162847.png"></p><ol start="11"><li>点击“安全列表”，点击默认的安全组</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126154659.png"></p><ol start="12"><li>依次点击“入站规则”→“添加入站规则”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126154907.png"></p><ol start="13"><li>按照下图设置</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126155136.png"><br><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126163052.png"></p><ol start="14"><li>将其自带的规则删除</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126155240.png"></p><ol start="15"><li>依次点击“出站规则”→“添加出站规则”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126163232.png"></p><ol start="16"><li>按照下图设置</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126163324.png"></p><ol start="17"><li>进入实例，点击“附加的VNIC”，点击默认的VNIC</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126162249.png"></p><ol start="18"><li>依次点击“IPv6地址”→“分配IPv6地址”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126162340.png"></p><ol start="19"><li>输入“:”+四位数字，点击“分配”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126163847.png"></p><ol start="20"><li>这就分配好IPv6的地址了</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126163920.png"></p><ol start="21"><li>重启VPS，可以看到IPv6已经启用并显示IPv4地址了。</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126164146.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> IPv6 </tag>
+            
+            <tag> 甲骨文 </tag>
+            
+            <tag> oracle </tag>
+            
+            <tag> 防火墙 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>甲骨文Oracle Cloud防火墙开启端口</title>
+      <link href="/oracle-firewall/"/>
+      <url>/oracle-firewall/</url>
+      
+        <content type="html"><![CDATA[<p>在我们的实际使用中，我们经常需要将VPS的所有端口放开。但是Oracle Cloud为了安全考虑，默认只开启了22端口，下面就和大家一起打开VPS的所有端口。</p><ol><li>登录<a href="https://www.oracle.com/cloud/sign-in.html?intcmp=OcomFreeTier&source=CloudFree_CTA1_Default">控制面板</a></li><li>在控制台更改为中文</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126102416.png"></p><ol start="3"><li>进入菜单，依次点击“网络”→“虚拟云网络”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126153923.png"></p><ol start="4"><li>进入默认创建好的云网络块</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126154622.png"></p><ol start="5"><li>点击“安全列表”，点击默认的安全组</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126154659.png"></p><ol start="6"><li>依次点击“入站规则”→“添加入站规则”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126154907.png"></p><ol start="7"><li>如图设置</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126155136.png"></p><ol start="8"><li>将其自带的规则删除</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126155240.png"></p><ol start="9"><li>如为Oracle Cloud的CentOS或Ubuntu自带系统，运行以下命令放开端口</li></ol><p>CentOS：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">systemctl stop oracle-cloud-agent</span><br><span class="line">systemctl disable oracle-cloud-agent</span><br><span class="line">systemctl stop oracle-cloud-agent-updater</span><br><span class="line">systemctl disable oracle-cloud-agent-updater</span><br><span class="line">systemctl stop firewalld.service</span><br><span class="line">systemctl disable firewalld.service</span><br></pre></td></tr></table></figure><p>Ubuntu：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">iptables -P INPUT ACCEPT</span><br><span class="line">iptables -P FORWARD ACCEPT</span><br><span class="line">iptables -P OUTPUT ACCEPT</span><br><span class="line">iptables -F</span><br><span class="line">apt-get purge netfilter-persistent -y</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> 甲骨文 </tag>
+            
+            <tag> firewall </tag>
+            
+            <tag> oracle </tag>
+            
+            <tag> 防火墙 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>VPS修改登录方式为Root+密码登录</title>
+      <link href="/root-pwd-login/"/>
+      <url>/root-pwd-login/</url>
+      
+        <content type="html"><![CDATA[<p>在某些VPS厂商（如甲骨文、LinuxONE）中，登录VPS的默认方式就是其系统设置的用户名+密码登录。但是我们还是喜欢使用root密码登录。这下要怎么办呢？下面是两种方法来设置root+密码的方式来登录</p><h2 id="一键脚本"><a href="#一键脚本" class="headerlink" title="一键脚本"></a>一键脚本</h2><ol><li>SSH登录至VPS</li><li>执行<code>sudo -i</code>切换到root用户</li><li>运行以下脚本</li></ol><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget -N https://cdn.jsdelivr.net/gh/Misaka-blog/rootLogin@master/root.sh &amp;&amp; chmod -R 777 root.sh &amp;&amp; bash root.sh</span><br></pre></td></tr></table></figure><ol start="4"><li>输入你想设置的密码</li><li>设置成功</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126152027.png"></p><ol start="6"><li>测试使用root用户登录至VPS、登录成功</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126152358.png"></p><h2 id="手动设置"><a href="#手动设置" class="headerlink" title="手动设置"></a>手动设置</h2><ol><li>SSH登录至VPS</li><li>执行<code>sudo -i</code>切换到root用户</li><li>使用vim编辑器编辑<code>/etc/sshd/sshd_config</code>文件，把<code>#PermitRootLogin prohibit-password</code>改为<code>PermitRootLogin yes</code>，<code>#PubkeyAuthentication yes</code>改为<code>PasswordAuthentication yes</code>，保存并退出</li><li>使用<code>passwd root</code>命令设置root密码</li><li>重启ssh服务</li><li>测试使用root用户登录至VPS、登录成功</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126152358.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+          <category> 脚本 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> 脚本 </tag>
+            
+            <tag> root </tag>
+            
+            <tag> 密码 </tag>
+            
+            <tag> 登录 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>甲骨文Oracle Cloud申请AMD机器教程</title>
+      <link href="/oracle-amd/"/>
+      <url>/oracle-amd/</url>
+      
+        <content type="html"><![CDATA[<p>在成功申请Oracle Cloud之后，我们肯定是迫不及待的开机器了嘛！这篇文章我来教大家来在Oracle Cloud控制面板上开AMD机器。感谢TG群某位大佬给我申请的Oracle Cloud账号来编写本文章！</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>注册好的Oracle Cloud账号</li></ul><h2 id="步骤方法"><a href="#步骤方法" class="headerlink" title="步骤方法"></a>步骤方法</h2><ol><li>登录<a href="https://www.oracle.com/cloud/sign-in.html?intcmp=OcomFreeTier&source=CloudFree_CTA1_Default">控制面板</a></li><li>在控制台更改为中文</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126102416.png"></p><ol start="3"><li>进入菜单，依次点击“计算”→“实例”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126103309.png"></p><ol start="4"><li>点击“创建实例”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126103409.png"></p><ol start="5"><li>输入名称、选择系统镜像，配置选择“VM.Standard.E2.1.Micro”，网络一般默认即可，SSH密钥可以用网站生成的，也可以自己上传，指定引导卷大小（我这选默认了），点击“创建”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126113105.png"></p><ol start="6"><li>等待部署</li><li>待部署完成后，会显示VPS的信息。复制IP地址并使用密钥连接VPS</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220126113407.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> Oracle </tag>
+            
+            <tag> AMD </tag>
+            
+            <tag> 甲骨文 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>在LinuxONE部署ShadowSocks实现科学上网</title>
+      <link href="/linux1-ss/"/>
+      <url>/linux1-ss/</url>
+      
+        <content type="html"><![CDATA[<p>在IBM LinuxONE的机器中，由于机器CPU是s390x的架构，并不能实现以正常模式安装ShadowSocks等脚本。本文章就来和大家在IBM LinuxONE一起搭建ShadowSocks服务器，实现科学上网！</p><blockquote><p>PS: 在IBM LinuxONE部署代理服务有可能会被IBM认定为滥用导致封号</p></blockquote><ol><li>SSH登录VPS</li><li>使用<code>sudo -i</code>提权</li><li>运行以下代码</li></ol><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget --no-check-certificate -O shadowsocks-all.sh https://raw.githubusercontent.com/teddysun/shadowsocks_install/master/shadowsocks-all.sh &amp;&amp; chmod +x shadowsocks-all.sh &amp;&amp; ./shadowsocks-all.sh 2&gt;&amp;1 | tee shadowsocks-all.log</span><br></pre></td></tr></table></figure><ol start="4"><li>选择ShadowSocks服务器类型（一定要选Shadowsocks-libev，否则无法使用！！！），输入节点密码、端口，选择加密方式</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220125112736.png"></p><ol start="5"><li>安装simple-obfs插件，一般默认不安装</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220125112924.png"></p><ol start="6"><li>等待编译安装</li><li>待显示出服务器信息，即为安装成功</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220125113246.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+          <category> 脚本 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> 节点 </tag>
+            
+            <tag> 科学上网 </tag>
+            
+            <tag> LinuxONE </tag>
+            
+            <tag> IBM </tag>
+            
+            <tag> ShadowSocks </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>IBM LinuxONE 申请及连接教程</title>
+      <link href="/linux1/"/>
+      <url>/linux1/</url>
+      
+        <content type="html"><![CDATA[<p>IBM LinuxONE是一个为托管企业Linux应用程序而构建的服务器系列。它的体系结构被称为s390x，旨在为每个CPU核心提供更多的计算能力。这解锁了用更少的内核驱动更多处理的能力，并且在软件许可证成本按内核大小调整的情况下，可以转化为巨大的成本节约。这是一个免费的、24 x 7、企业级、开放访问、共享的公共云环境，位于IBM的LinuxONE平台上。开发者、学生、教授、企业家或来自世界各地的任何人都可以注册120天的虚拟服务器访问权限，完全可以在LinuxONE上开发、测试或运行开源应用程序，或访问提供的任何其他服务。</p><p>这篇文章来教大家如何申请IBM LinuxONE的VPS</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一枚邮箱（最好是Gmail、Outlook之类的大厂邮箱）</li></ul><h1 id="申请流程"><a href="#申请流程" class="headerlink" title="申请流程"></a>申请流程</h1><ol><li>打开<a href="https://linuxone.cloud.marist.edu/#/login">官网</a></li><li>点击“Register”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220125103619.png"></p><ol start="3"><li>填入邮箱，密码，姓名和理由，点击“Request your trial”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220125103727.png"></p><blockquote><p>目前因为国人的疯狂滥用，Learn linux极大概率会审核不通过，建议写理由写得实际些，比如编译程序、科学研究、仿真实验等。建议使用Deepl翻译软件翻译理由出来</p></blockquote><ol start="4"><li>检查邮件内的激活链接，点击激活</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220125104132.png"></p><blockquote><p>PS: 有部分情况会触发人工审核，如下图。这时是使用了小厂的邮箱或注册时的IP不干净导致的</p></blockquote><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220125103850.png"></p><ol start="5"><li>注册成功，这时IBM的另外一封邮件会提示到期时间</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220125104156.png"></p><ol start="6"><li>登录账号</li><li>点击“Virtual Servers”</li><li>点击“Create”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220125104558.png"></p><ol start="9"><li>输入主机名，选择系统、配置，创建和选择SSH密钥串，点击“Create”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220125104721.png"></p><ol start="10"><li>等待创建</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220125104817.png"></p><ol start="11"><li>待创建完成后，管理页面会显示出IPv4的地址</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220125105126.png"></p><ol start="12"><li>连接成功</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220125105244.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> LinuxONE </tag>
+            
+            <tag> IBM </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Acme.sh 一键申请证书脚本及说明</title>
+      <link href="/acme-1key/"/>
+      <url>/acme-1key/</url>
+      
+        <content type="html"><![CDATA[<p>为了解决大家的证书申请问题，我鄙人根据勇哥的半成品，编写并完善了基于Acme.sh的一键申请证书脚本。这个脚本只需要一条命令，就可以申请并使用SSL证书了</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一枚域名（解析到自己VPS的IP）</li><li>一台VPS（什么类型的都可以）</li></ul><h2 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget -N https://cdn.jsdelivr.net/gh/Misaka-blog/acme-1key@master/acme1key.sh &amp;&amp; chmod -R 777 acme1key.sh &amp;&amp; bash acme1key.sh</span><br></pre></td></tr></table></figure><p>快捷方式：<code>bash acme1key.sh</code></p><h3 id="单域名申请证书"><a href="#单域名申请证书" class="headerlink" title="单域名申请证书"></a>单域名申请证书</h3><ol><li>打开CF，找到自己的域名，新增一条记录，解析到自己的VPS</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220121164320.png"></p><ol start="2"><li>运行脚本</li><li>输入1申请证书</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220121164506.png"></p><ol start="4"><li>等待脚本自动安装Acme.sh及依赖</li><li>输入邮箱，如未输入邮箱脚本会自动生成一个邮箱以执行接下来的步骤</li><li>输入解析完成的域名</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220121164646.png"></p><ol start="7"><li>如无意外，证书申请成功，申请到的证书默认保存到<code>/root</code>文件夹</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220121164737.png"></p><h3 id="查询、撤销并删除当前已申请的域名证书"><a href="#查询、撤销并删除当前已申请的域名证书" class="headerlink" title="查询、撤销并删除当前已申请的域名证书"></a>查询、撤销并删除当前已申请的域名证书</h3><ol><li>运行脚本</li><li>输入2</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220121164506.png"></p><ol start="3"><li>输入“Main_Domain”下的域名，如仅为查询则按<code>Ctrl</code>+<code>C</code>键退出脚本</li><li>撤销并删除证书成功</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220121171630.png"></p><h3 id="手动续期域名证书"><a href="#手动续期域名证书" class="headerlink" title="手动续期域名证书"></a>手动续期域名证书</h3><ol><li>运行脚本</li><li>输入3</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220121164506.png"></p><ol start="3"><li>输入“Main_Domain”下的域名</li><li>续期证书成功</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220121171950.png"></p><h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><p>本脚本使用的是Acme.sh的80端口证书申请模式，在运行前请关闭任何占用80端口的服务</p><p>本脚本与WARP脚本冲突，使用前请输入<code>warp o</code>暂时关闭warp</p><h2 id="仓库地址"><a href="#仓库地址" class="headerlink" title="仓库地址"></a>仓库地址</h2><p><a href="https://github.com/Misaka-blog/acme-1key">https://github.com/Misaka-blog/acme-1key</a></p><p>喜欢的点个Star再走吧！</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 脚本 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> acme </tag>
+            
+            <tag> ssl </tag>
+            
+            <tag> 证书 </tag>
+            
+            <tag> 域名 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>在Windows11修复Internet Explorer</title>
+      <link href="/FixIE-Windows11/"/>
+      <url>/FixIE-Windows11/</url>
+      
+        <content type="html"><![CDATA[<p>在Windows 11中，微软为了继续推广其自家的Edge浏览器，故意禁用在Windows 11的IE浏览器，为使用网银等部分zf网站的用户造成不便。下面是我在给某位老师在Windows 11的维护记录，其中就讲明了如何启用Windows 11的IE浏览器。</p><h2 id="步骤方法"><a href="#步骤方法" class="headerlink" title="步骤方法"></a>步骤方法</h2><ol><li>打开系统默认的“Microsoft Edge”浏览器</li><li>按照下图设置</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220118223522.png"></p><ol start="3"><li>下载<a href="https://raw.githubusercontents.com/Misaka-blog/hijk-backup/master/Windows11IEFix.exe">Windows 11 IE浏览器修复工具</a></li><li>打开工具</li><li>点击“修复当前系统”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220118223940.png"></p><ol start="6"><li>创建桌面图标</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220118224005.png"></p><ol start="7"><li>完成</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220118224050.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Windows </category>
+          
+          <category> 记录 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> InternetExplorer </tag>
+            
+            <tag> IE浏览器 </tag>
+            
+            <tag> Windows </tag>
+            
+            <tag> Windows 11 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>微软Microsoft Learn临时Windows远程桌面</title>
+      <link href="/MSLearn-WinDesktop/"/>
+      <url>/MSLearn-WinDesktop/</url>
+      
+        <content type="html"><![CDATA[<p>在部分情况下，可能会有一会需要使用远程桌面的需求。微软公司的Microsoft Learn提供了Windows的远程桌面沙盒环境，可以使用2个小时。2个小时便于我们申请一些外国账号啥的应该够用了。</p><h2 id="申请方法"><a href="#申请方法" class="headerlink" title="申请方法"></a>申请方法</h2><ol><li>打开<a href="https://docs.microsoft.com/en-us/learn/modules/implement-common-integration-features-finance-ops/10-exercise-1">这个学习页面</a>或<a href="https://docs.microsoft.com/en-us/learn/modules/extend-elements-finance-operations/4-exercise">备用学习页面</a></li><li>点击“Sign in to launch VM Mode”，按照提示登录</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115150026.png"></p><ol start="3"><li>通过人机验证</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115185433.png"></p><ol start="4"><li>等待创建虚拟机</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115185809.png"></p><ol start="5"><li>点击“Resources”，点击“Password”前面的“T”按钮输入密码</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115185858.png"></p><ol start="6"><li>进入桌面，创建完成</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115190145.png"></p><ol start="7"><li>在CMD内输入以下命令清理磁盘空间</li></ol><figure class="highlight bat"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">taskkill</span> /f /im sqlservr.exe</span><br><span class="line"><span class="built_in">taskkill</span> /f /im Batch.exe</span><br><span class="line"><span class="built_in">taskkill</span> /f /im w3wp.exe</span><br><span class="line"><span class="built_in">cd</span> C:\</span><br><span class="line"><span class="built_in">rmdir</span> /s /q AOSService</span><br><span class="line"><span class="built_in">rmdir</span> /s /q DumpPath</span><br><span class="line"><span class="built_in">rmdir</span> /s /q DynamicsDiagnostics</span><br><span class="line"><span class="built_in">rmdir</span> /s /q DynamicsSDK</span><br><span class="line"><span class="built_in">rmdir</span> /s /q DynamicsTools</span><br><span class="line"><span class="built_in">rmdir</span> /s /q EmptyDataset</span><br><span class="line"><span class="built_in">rmdir</span> /s /q FinancialReporting</span><br><span class="line"><span class="built_in">rmdir</span> /s /q Labs</span><br><span class="line"><span class="built_in">rmdir</span> /s /q PerfSDK</span><br><span class="line"><span class="built_in">rmdir</span> /s /q RetailSDK</span><br><span class="line"><span class="built_in">rmdir</span> /s /q RetailSelfService</span><br><span class="line"><span class="built_in">rmdir</span> /s /q RetailServer</span><br><span class="line"><span class="built_in">rmdir</span> /s /q RetailStorefront</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Windows </tag>
+            
+            <tag> Microsoft </tag>
+            
+            <tag> Microsoft Learn </tag>
+            
+            <tag> 微软 </tag>
+            
+            <tag> 远程桌面 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>VPS使用x-ui搭建节点</title>
+      <link href="/x-ui/"/>
+      <url>/x-ui/</url>
+      
+        <content type="html"><![CDATA[<p>相信大家撸VPS就是为了满足自己的科学上网的需求吧。在我们的实际应用中，我们有许多种可以搭建节点的方式。X-ui就是其中的一种方式，可以让用户在图形化页面中配置节点。</p><p>这篇文章就以Hax的IPv6 VPS为例，教大家如何安装X-ui并配置节点</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一台VPS</li><li>一枚域名</li></ul><h2 id="部署安装"><a href="#部署安装" class="headerlink" title="部署安装"></a>部署安装</h2><ol><li>复制粘贴以下代码，并运行</li></ol><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bash &lt;(curl -Ls https://raw.githubusercontents.com/vaxilu/x-ui/master/install.sh)</span><br></pre></td></tr></table></figure><blockquote><p>PS: 在IPv6 Only的VPS中（例如：Euserv、Hax），请先安装warp，否则无法访问Github API而报错</p></blockquote><ol start="2"><li>待出现X-ui的菜单时，就已经成功一半了！</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115163438.png"></p><ol start="3"><li>使用“IP:54321”（[IPV6]:54321）登录面板，默认的用户名和密码都是“admin”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115164203.png"></p><p>提示：如网络不自带IPV6地址，可使用<a href="https://hax.co.id/ipv6-to-ipv4/">Hax的IPv4 to IPv6功能</a>来转发自己的X-ui面板端口</p><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115163812.png"></p><ol start="4"><li>进入到X-ui的面板</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115164228.png"></p><ol start="5"><li>为了面板的安全起见，先去面板设置更改管理员用户名密码</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115164637.png"></p><ol start="6"><li>进入CloudFlare，选择你自己的域名，设置DNS记录到你的VPS IP，小云朵记得开启（如需要防被墙）</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115165311.png"></p><ol start="7"><li>进入SSL&#x2F;TLS下面的概述，将加密方式改为完全</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115165520.png"></p><ol start="8"><li>进入“源服务器”，点击“创建证书”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115165358.png"></p><ol start="9"><li>保持默认，点击“创建”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115165646.png"></p><ol start="10"><li>复制证书和私钥，备用</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115165852.png"></p><ol start="11"><li>进入X-ui面板的入站列表，新建一个节点</li><li>下图为使用CF CDN配置，当然如果你不用CDN的话，你自己想怎么配置都可以。</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115170734.png"></p><ol start="13"><li>点击“操作”→“二维码”，导出节点</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115170846.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+          <category> 脚本 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> xui </tag>
+            
+            <tag> 节点 </tag>
+            
+            <tag> 科学上网 </tag>
+            
+            <tag> IPv4 </tag>
+            
+            <tag> IPv6 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>在VPS内安装WARP变成双栈VPS</title>
+      <link href="/warp-vps/"/>
+      <url>/warp-vps/</url>
+      
+        <content type="html"><![CDATA[<p>在IPv6 Only的VPS（例如：Hax和Euserv）中，我们想无限制的使用IPv4的资源。又或者是IPv4 only的VPS，想无限制的使用IPv6的资源。这篇文章来和大家聊一聊如何安装WARP，让自己的VPS变成双栈的VPS</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ul><li>一台VPS</li><li>开启TUN模块（仅限LXC &#x2F; OpenVZ架构的VPS）</li></ul><h2 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h2><ol><li>打开TUN模块（如果是KVM机器可跳过此步骤）。以Hax官网为例，打开官网的控制面板，点击“Enable TUN”按钮，稍等片刻后再点击“Restart”按钮重启VPS</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115155318.png"></p><ol start="2"><li>输入<code>cat /dev/net/tun</code>命令，检查TUN模块状态，如出现“cat: &#x2F;dev&#x2F;net&#x2F;tun: File descriptor in bad state”时即为开启成功</li><li>复制以下安装命令</li></ol><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget -N https://cdn.jsdelivr.net/gh/fscarmen/warp/menu.sh &amp;&amp; bash menu.sh</span><br></pre></td></tr></table></figure><ol start="4"><li>选择语言，输入2选择简体中文</li><li>输入“1”安装WARP（IPV4连接走WARP的流量），当然你输入“2”也可以（全部连接走WARP的流量）</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115160104.png"></p><ol start="6"><li>选择账户类型，IPV4优先级</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115160250.png"></p><ol start="7"><li>等待安装，待安装完成后会出现安装的结果</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115160532.png"></p><h2 id="注意事项"><a href="#注意事项" class="headerlink" title="注意事项"></a>注意事项</h2><ol><li>WARP的IP只是给你访问IPV4 &#x2F; IPV6资源的代理IP，并非公网IP</li><li>对于部分CloudFlare CDN的网站，使用WARP+或WARP Teams账户会走专线，实现加速效果</li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+          <category> 脚本 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> IPv4 </tag>
+            
+            <tag> IPv6 </tag>
+            
+            <tag> WARP </tag>
+            
+            <tag> Netfilx </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>使用CloudFlareSpeedTest优选出适合自己的CF IP</title>
+      <link href="/cf-ip/"/>
+      <url>/cf-ip/</url>
+      
+        <content type="html"><![CDATA[<p>在我们使用套了CloudFlare CDN节点时，会速度很慢。那是因为CloudFlare分配的CF IP大部分对中国用户不太友好，所以我们需要使用一个工具来优选优选适合自己的CF IP</p><p>本文使用的是<a href="https://github.com/XIU2/CloudflareSpeedTest">XIU2&#x2F;CloudflareSpeedTest</a>的项目，感谢原作者的付出</p><h2 id="准备材料"><a href="#准备材料" class="headerlink" title="准备材料"></a>准备材料</h2><ol><li>一台电脑或国内VPS</li></ol><h2 id="步骤方法"><a href="#步骤方法" class="headerlink" title="步骤方法"></a>步骤方法</h2><ol><li>打开<a href="https://github.com/XIU2/CloudflareSpeedTest">项目主页</a>，点击“Releases”</li><li>根据你自己的电脑选择对应的版本</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220115204837.png"></p><ol start="3"><li>解压，打开“CloudFlareST.exe”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220115204919.png"></p><ol start="4"><li>等待优选IP</li><li>优选IP完成，IP将会按照速度由上到下排序，复制出最快的</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang/20220115205451.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+          <category> 脚本 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> CloudFlare </tag>
+            
+            <tag> 节点 </tag>
+            
+            <tag> 科学上网 </tag>
+            
+            <tag> CDN </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>Hax VPS 白嫖教程</title>
+      <link href="/Hax-VPS/"/>
+      <url>/Hax-VPS/</url>
+      
+        <content type="html"><![CDATA[<p>Hax这个网站提供了免费的IPV6 VPS，以及免费的网络虚拟空间的服务。</p><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115104952.png"></p><p>本篇文章就来和大家分享白嫖Hax IPV6 VPS的过程及连接方法</p><h2 id="注册VPS"><a href="#注册VPS" class="headerlink" title="注册VPS"></a>注册VPS</h2><ol><li>打开<a href="https://hax.co.id/">官网</a>，点击右上角的“Register”注册</li><li>在Telegram上打开<a href="https://t.me/HaxTG_bot">@HaxTG_bot</a>，输入<code>/getid</code>命令获取自己的Telegram ID，复制粘贴到网页中，点击“Submit”按钮</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115110058.png"></p><ol start="3"><li><p>稍后会在Telegram上收到bot发来的验证码，输入验证码，设置密码，登录账号</p></li><li><p>设置好VPS参数之后，点击“Create VPS”按钮</p></li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115111747.png"></p><ol start="5"><li>等待1-3分钟，然后就出现了VPS的登录信息</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115112050.png"></p><h2 id="连接VPS"><a href="#连接VPS" class="headerlink" title="连接VPS"></a>连接VPS</h2><ol><li>打开<a href="https://test-ipv6.com/">test-ipv6.com</a>，检查自己的IPV6连接情况</li></ol><h3 id="如有IPV6"><a href="#如有IPV6" class="headerlink" title="如有IPV6"></a>如有IPV6</h3><ol><li>复制粘贴VPS的IPV6地址</li><li>打开Xshell，新建一个会话</li><li>按照下图设置</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115113101.png"></p><ol start="4"><li>点击“用户身份验证”，用户名输入“root”，密码输入你设置的密码</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115113508.png"></p><ol start="5"><li>点击“连接”</li></ol><h3 id="如没有IPV6"><a href="#如没有IPV6" class="headerlink" title="如没有IPV6"></a>如没有IPV6</h3><h4 id="Web-Terminal"><a href="#Web-Terminal" class="headerlink" title="Web Terminal"></a>Web Terminal</h4><ol><li>打开<a href="https://ssh.hax.co.id/">ssh.hax.co.id</a></li><li>输入自己VPS的IPV6地址，用户名和密码，点击“Connect”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115113718.png"></p><h4 id="IPV4转发"><a href="#IPV4转发" class="headerlink" title="IPV4转发"></a>IPV4转发</h4><ol><li>打开Hax的<a href="https://hax.co.id/ipv6-to-ipv4/">IPV4 to IPV6</a>页面</li><li>按照下图设置，点击“Request to forward port”</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115114038.png"></p><ol start="3"><li>打开Xshell，新建一个会话</li><li>按照下图设置</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115114151.png"></p><ol start="5"><li>点击“用户身份验证”，用户名输入“root”，密码输入你设置的密码</li></ol><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master/20220115113508.png"></p><ol start="6"><li>点击“连接”</li></ol><h2 id="续期"><a href="#续期" class="headerlink" title="续期"></a>续期</h2><p>在“Extend VPS”处，输入官网地址，输入数字验证码和完成谷歌验证码，点击“Extend VPS”即可</p><p><img src="https://cdn.jsdelivr.net/gh/Misaka-blog/tuchuang@master//20220204082039.png"></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> VPS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> VPS </tag>
+            
+            <tag> Hax </tag>
+            
+            <tag> 白嫖 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+  
+  
+</search>
